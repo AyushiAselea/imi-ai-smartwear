@@ -100,7 +100,7 @@ const ProductsSection = () => {
               </div>
 
               <a
-                href="#cta"
+                href={product.premium ? "/product/mark-2" : "/product/mark-1"}
                 className={`block text-center py-3 rounded-full font-semibold text-sm transition-opacity hover:opacity-90 ${
                   product.premium
                     ? "bg-primary text-primary-foreground"
