@@ -1,18 +1,24 @@
 import { useState } from "react";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Sun, Moon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
+import logoWhite from "@/assets/new Final IMI LOGO.png";
+import logoBlack from "@/assets/WhatsApp Image 2025-09-08 at 6.23.45 PM.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+
+  const logo = theme === "dark" ? logoWhite : logoBlack;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <Link to="/" className="text-2xl font-bold tracking-tight font-display">
-          IMI<span className="text-primary">.</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="IMI" className="h-8 w-auto" />
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
@@ -23,6 +29,13 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           {!loading && (
             <>
               {user ? (
@@ -52,9 +65,18 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <button className="md:hidden text-foreground" onClick={() => setOpen(!open)}>
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button className="text-foreground" onClick={() => setOpen(!open)}>
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -66,7 +88,7 @@ const Navbar = () => {
             className="md:hidden glass border-t border-border/50"
           >
             <div className="flex flex-col gap-4 px-6 py-6 text-sm font-medium">
-              <a href="/#products" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">Products</a>
+              <a href="/#products" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">HOME </a>
               <a href="/#features" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">Features</a>
               <a href="/#compare" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">Compare</a>
               <a href="/#why" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">Why IMI</a>
