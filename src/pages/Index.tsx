@@ -1,13 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { Helmet } from "react-helmet-async";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import ProductsSection from "@/components/ProductsSection";
+import FeaturesSection from "@/components/FeaturesSection";
+import ComparisonSection from "@/components/ComparisonSection";
+import WhyImiSection from "@/components/WhyImiSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
+import CtaSection from "@/components/CtaSection";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      <Helmet>
+        <title>AI Smart Glasses in India | IMI Mark 1 & Mark 2</title>
+        <meta
+          name="description"
+          content="Discover IMI AI smart glasses with voice assistant, camera, calling, and vision AI. Affordable wearable tech built for the future."
+        />
+        <meta name="keywords" content="AI smart glasses India, smart glasses with camera, voice assistant glasses, vision AI glasses, affordable smart glasses, wearable AI glasses" />
+      </Helmet>
+      <Navbar />
+      <main>
+        <HeroSection />
+        <ProductsSection />
+        <FeaturesSection />
+        <ComparisonSection />
+        <WhyImiSection />
+        <TestimonialsSection />
+        <CtaSection />
+      </main>
+      <Footer />
+    </>
   );
 };
 
