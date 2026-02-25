@@ -15,6 +15,7 @@ import PaymentFailure from "./pages/PaymentFailure";
 import { useEffect } from "react";
 import { initAnalytics } from "@/lib/analytics";
 import { loadTrackingScripts } from "@/lib/tracking";
+import { initButtonClickTracking } from "@/lib/gtagButtonTracker";
 import RouteTracker from "@/components/RouteTracker";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => {
   useEffect(() => {
     initAnalytics();
     loadTrackingScripts();
+    initButtonClickTracking();
   }, []);
 
   return (
