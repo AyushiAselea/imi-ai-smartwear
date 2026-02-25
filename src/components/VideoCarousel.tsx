@@ -164,6 +164,7 @@ const VideoCarousel = () => {
                 className="w-full h-full object-cover"
                 muted={isCenter ? isMuted : true}
                 playsInline
+                autoPlay={isCenter}
                 preload={absOffset <= 1 ? "auto" : "metadata"}
                 onEnded={isCenter ? handleVideoEnd : undefined}
               />
