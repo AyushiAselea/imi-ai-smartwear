@@ -17,12 +17,19 @@ export const useAuth = () => {
   const [loading, setLoading] = useState(true);
 
   const syncBackendToken = useCallback(async (email: string, name: string, provider: string) => {
-    try {
-      const res = await syncSocialUser(email, name, provider);
-      localStorage.setItem(TOKEN_KEY, res.token);
-    } catch {
-      // Silently fail — payment will re-prompt if token missing
+    // Retry up to 3 times with backoff — Render free tier can cold-start slowly
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await syncSocialUser(email, name, provider);
+        localStorage.setItem(TOKEN_KEY, res.token);
+        return; // success
+      } catch {
+        if (attempt < 3) {
+          await new Promise((r) => setTimeout(r, attempt * 1500));
+        }
+      }
     }
+    // All retries failed — payment flow will re-sync on demand
   }, []);
 
   useEffect(() => {

@@ -7,11 +7,10 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import mark1Img from "@/assets/mark1-glasses.jpg";
 import mark2Img from "@/assets/mark2-glasses.png";
-
-const mark1Video = "/videos/imi_ved2.mp4";
-const mark2Video = "/videos/imi_ved3.mp4";
+import mark1Video from "@/assets/imi_ved2.mp4";
+import mark2Video from "@/assets/imi_ved3.mp4";
 import { startPayment } from "@/lib/payment";
-import { updateCart } from "@/lib/api";
+import { updateCart, syncSocialUser } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
@@ -141,7 +140,24 @@ const ProductPage = () => {
       return;
     }
 
-    const token = localStorage.getItem("imi_token") || "";
+    let token = localStorage.getItem("imi_token") || "";
+
+    // Token missing but user is logged in (backend was cold-starting during login)
+    // Re-sync silently before blocking the user.
+    if (!token && user.email) {
+      try {
+        toast.loading("Connecting to payment server...", { id: "sync-toast" });
+        const res = await syncSocialUser(user.email, user.displayName || undefined, "google");
+        localStorage.setItem("imi_token", res.token);
+        token = res.token;
+        toast.dismiss("sync-toast");
+      } catch {
+        toast.dismiss("sync-toast");
+        toast.error("Unable to reach payment server. Please try again in a moment.");
+        return;
+      }
+    }
+
     if (!token) {
       toast.info("Please sign in again to continue");
       navigate("/auth");
