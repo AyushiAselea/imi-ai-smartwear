@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play } from "lucide-react";
+import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play, X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import mark1Img from "@/assets/mark1-glasses.jpg";
@@ -11,6 +11,7 @@ const mark1Video = "/videos/imi_ved2.mp4";
 const mark2Video = "/videos/imi_ved3.mp4";
 import { startPayment } from "@/lib/payment";
 import { updateCart, syncSocialUser } from "@/lib/api";
+import type { ShippingAddress } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
@@ -97,6 +98,21 @@ const ProductPage = () => {
   const { user } = useAuth();
   const { products: backendProducts } = useProducts();
 
+  // ── Checkout modal state ──
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState<"address" | "payment">("address");
+  const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "COD" | "PARTIAL">("ONLINE");
+  const [address, setAddress] = useState<ShippingAddress>({
+    fullName: "",
+    phone: "",
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "India",
+  });
+
   // Find matching backend product by name for payment integration
   const getBackendProductId = (): string | null => {
     if (!product || backendProducts.length === 0) return null;
@@ -164,22 +180,55 @@ const ProductPage = () => {
       return;
     }
 
+    // Open checkout modal
+    setShowCheckout(true);
+    setCheckoutStep("address");
+  };
+
+  const validateAddress = (): boolean => {
+    if (!address.fullName.trim()) { toast.error("Full name is required"); return false; }
+    if (!address.phone.trim() || address.phone.trim().length < 10) { toast.error("Valid phone number is required"); return false; }
+    if (!address.addressLine1.trim()) { toast.error("Address line 1 is required"); return false; }
+    if (!address.city.trim()) { toast.error("City is required"); return false; }
+    if (!address.state.trim()) { toast.error("State is required"); return false; }
+    if (!address.postalCode.trim() || address.postalCode.trim().length < 5) { toast.error("Valid postal code is required"); return false; }
+    return true;
+  };
+
+  const handleProceedToPayment = () => {
+    if (!validateAddress()) return;
+    setCheckoutStep("payment");
+  };
+
+  const handleConfirmOrder = async () => {
     setBuyingLoading(true);
     try {
+      const token = localStorage.getItem("imi_token") || "";
+      if (!token) { toast.error("Session expired. Please sign in again."); navigate("/auth"); return; }
+
       const sessionId = sessionStorage.getItem("imi_session_id") || "";
-      // Use backend product ID if available, otherwise pass inline details
       const backendProductId = getBackendProductId();
       const priceNum = parseInt(product!.price.replace(/[₹,]/g, ""));
       const payload = backendProductId
         ? { productId: backendProductId }
         : { productName: product!.name, price: priceNum };
-      await startPayment(payload, 1, token, sessionId);
-      // startPayment redirects to PayU — code below won't execute
+
+      const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
+
+      if (result.type === "cod") {
+        toast.success("Order placed successfully! Pay on delivery.");
+        setShowCheckout(false);
+        navigate("/payment/success?method=cod");
+      }
+      // For ONLINE/PARTIAL, startPayment redirects to PayU — code below won't execute
     } catch (err: any) {
       toast.error(err.message || "Payment failed. Please try again.");
+    } finally {
       setBuyingLoading(false);
     }
   };
+
+  const priceNum = product ? parseInt(product.price.replace(/[₹,]/g, "")) : 0;
 
   if (!product) {
     return (
@@ -353,6 +402,181 @@ const ProductPage = () => {
         </div>
       </main>
       <Footer />
+
+      {/* ── Checkout Modal ── */}
+      {showCheckout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-foreground">
+                {checkoutStep === "address" ? "Shipping Address" : "Payment Method"}
+              </h2>
+              <button
+                onClick={() => setShowCheckout(false)}
+                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {checkoutStep === "address" && (
+              <div className="space-y-3">
+                <input
+                  type="text"
+                  placeholder="Full Name *"
+                  value={address.fullName}
+                  onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone Number *"
+                  value={address.phone}
+                  onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Address Line 1 *"
+                  value={address.addressLine1}
+                  onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                />
+                <input
+                  type="text"
+                  placeholder="Address Line 2 (Optional)"
+                  value={address.addressLine2}
+                  onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                />
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="City *"
+                    value={address.city}
+                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="State *"
+                    value={address.state}
+                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="PIN Code *"
+                    value={address.postalCode}
+                    onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    value={address.country}
+                    onChange={(e) => setAddress({ ...address, country: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
+                  />
+                </div>
+                <button
+                  onClick={handleProceedToPayment}
+                  className="w-full py-3 mt-2 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+                >
+                  Continue to Payment
+                </button>
+              </div>
+            )}
+
+            {checkoutStep === "payment" && (
+              <div className="space-y-4">
+                {/* Order summary */}
+                <div className="rounded-xl bg-background border border-border p-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Product</span>
+                    <span className="text-foreground font-medium">{product?.name}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Total</span>
+                    <span className="text-foreground font-bold">₹{priceNum.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Ship to</span>
+                    <span className="text-foreground text-right text-xs max-w-[60%]">{address.addressLine1}, {address.city}</span>
+                  </div>
+                </div>
+
+                {/* Payment options */}
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Choose Payment</p>
+
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      paymentMethod === "ONLINE" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    <input type="radio" name="pm" checked={paymentMethod === "ONLINE"} onChange={() => setPaymentMethod("ONLINE")} className="accent-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Pay Full Amount Online</p>
+                      <p className="text-xs text-muted-foreground">₹{priceNum.toLocaleString()} via PayU (UPI / Card / Net Banking)</p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    <input type="radio" name="pm" checked={paymentMethod === "COD"} onChange={() => setPaymentMethod("COD")} className="accent-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Cash on Delivery</p>
+                      <p className="text-xs text-muted-foreground">Pay ₹{priceNum.toLocaleString()} when delivered</p>
+                    </div>
+                  </label>
+
+                  <label
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
+                      paymentMethod === "PARTIAL" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    <input type="radio" name="pm" checked={paymentMethod === "PARTIAL"} onChange={() => setPaymentMethod("PARTIAL")} className="accent-primary" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">Pay 50% Now</p>
+                      <p className="text-xs text-muted-foreground">
+                        Pay ₹{Math.round(priceNum * 0.5).toLocaleString()} now · ₹{Math.round(priceNum * 0.5).toLocaleString()} on delivery
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setCheckoutStep("address")}
+                    className="flex-1 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors"
+                  >
+                    Back
+                  </button>
+                  <button
+                    onClick={handleConfirmOrder}
+                    disabled={buyingLoading}
+                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {buyingLoading
+                      ? "Processing..."
+                      : paymentMethod === "COD"
+                      ? "Place Order"
+                      : paymentMethod === "PARTIAL"
+                      ? `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} Now`
+                      : `Pay ₹${priceNum.toLocaleString()}`}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

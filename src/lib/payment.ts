@@ -1,4 +1,4 @@
-import { initiatePayment, type PaymentData } from "@/lib/api";
+import { initiatePayment, type PaymentData, type ShippingAddress } from "@/lib/api";
 import { recoverCart } from "@/lib/api";
 
 /**
@@ -37,19 +37,30 @@ function submitPayUForm(paymentData: PaymentData) {
 }
 
 /**
- * Initiates the PayU payment flow:
- * 1. Calls backend to create order and get PayU form data
- * 2. Auto-submits form to redirect to PayU
+ * Result type for startPayment — either a redirect (online/partial) or an order (COD).
+ */
+export interface PaymentResult {
+  type: "redirect" | "cod";
+  order?: unknown;
+}
+
+/**
+ * Initiates the payment flow:
+ * 1. Calls backend to create order and get PayU form data (or COD order)
+ * 2. ONLINE/PARTIAL → auto-submits form to redirect to PayU
+ * 3. COD → returns immediately with the created order
  */
 export async function startPayment(
   payload: { productId?: string; productName?: string; price?: number },
   quantity: number,
   token: string,
-  sessionId?: string
-): Promise<void> {
-  const response = await initiatePayment(payload, quantity, token);
+  paymentMethod: string = "ONLINE",
+  shippingAddress?: ShippingAddress,
+  sessionId?: string,
+): Promise<PaymentResult> {
+  const response = await initiatePayment(payload, quantity, token, paymentMethod, shippingAddress);
 
-  if (!response.success || !response.paymentData) {
+  if (!response.success) {
     throw new Error(response.message || "Failed to initiate payment");
   }
 
@@ -58,6 +69,15 @@ export async function startPayment(
     recoverCart(sessionId);
   }
 
-  // Redirect to PayU
+  // COD — order created immediately, no PayU redirect
+  if (response.paymentMethod === "COD") {
+    return { type: "cod", order: response.order };
+  }
+
+  // ONLINE or PARTIAL — redirect to PayU
+  if (!response.paymentData) {
+    throw new Error("Missing payment data from server");
+  }
   submitPayUForm(response.paymentData);
+  return { type: "redirect" };
 }

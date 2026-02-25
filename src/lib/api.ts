@@ -122,17 +122,32 @@ export interface PaymentData {
 export interface PaymentResponse {
   success: boolean;
   message: string;
-  paymentData: PaymentData;
+  paymentMethod: string;
+  paymentData?: PaymentData;
+  order?: unknown;
+}
+
+export interface ShippingAddress {
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
 }
 
 export const initiatePayment = (
   payload: { productId?: string; productName?: string; price?: number },
   quantity: number,
-  token: string
+  token: string,
+  paymentMethod: string = "ONLINE",
+  shippingAddress?: ShippingAddress,
 ): Promise<PaymentResponse> =>
   apiRequest<PaymentResponse>("/payment/create", {
     method: "POST",
-    body: { ...payload, quantity },
+    body: { ...payload, quantity, paymentMethod, shippingAddress },
     token,
   });
 

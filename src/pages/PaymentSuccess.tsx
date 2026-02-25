@@ -9,6 +9,8 @@ const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const txnid = searchParams.get("txnid");
   const mihpayid = searchParams.get("mihpayid");
+  const method = searchParams.get("method");
+  const isCOD = method === "cod";
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
@@ -17,13 +19,15 @@ const PaymentSuccess = () => {
       verifyPayment(txnid, token)
         .then(() => setVerified(true))
         .catch(() => setVerified(true)); // Show success regardless — PayU already confirmed
+    } else if (isCOD) {
+      setVerified(true);
     }
-  }, [txnid]);
+  }, [txnid, isCOD]);
 
   return (
     <>
       <Helmet>
-        <title>Payment Successful | IMI AI Smart Glasses</title>
+        <title>{isCOD ? "Order Placed" : "Payment Successful"} | IMI AI Smart Glasses</title>
       </Helmet>
       <Navbar />
       <main className="pt-24 pb-16 px-6 min-h-screen flex items-center justify-center">
@@ -33,9 +37,13 @@ const PaymentSuccess = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-3xl font-bold mb-4">Payment Successful!</h1>
+          <h1 className="text-3xl font-bold mb-4">
+            {isCOD ? "Order Placed!" : "Payment Successful!"}
+          </h1>
           <p className="text-muted-foreground mb-2">
-            Thank you for your purchase. Your order has been confirmed.
+            {isCOD
+              ? "Your order has been confirmed. Please pay the full amount on delivery."
+              : "Thank you for your purchase. Your order has been confirmed."}
           </p>
           {txnid && (
             <p className="text-sm text-muted-foreground mb-6">
