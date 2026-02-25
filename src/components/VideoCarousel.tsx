@@ -2,10 +2,14 @@ import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from "lucide-react";
 
+// Cloudinary cloud name
+const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
+
 const videos = [
-  { src: "/videos/imi_ved2.mp4", title: "IMI in Action" },
-  { src: "/videos/imi_ved3.mp4", title: "Smart Features" },
-  { src: "/videos/imi_ved4.mp4", title: "AI Vision" },
+  { src: `${CLD}/imi_ved2_akl631.mp4`, title: "IMI in Action" },
+  { src: `${CLD}/imi_ved3_vnjdl5.mp4`, title: "Smart Features" },
+  { src: `${CLD}/imi_ved4_l3lh7b.mp4`, title: "AI Vision" },
+  { src: `${CLD}/imi_ved3_yzdei3.mp4`, title: "Everyday Style" },
 ];
 
 const VideoCarousel = () => {
