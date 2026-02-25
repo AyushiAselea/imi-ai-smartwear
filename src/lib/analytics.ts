@@ -163,7 +163,7 @@ export function trackSessionEnd() {
   };
 
   // Use beacon API for reliable delivery on page close
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+  const API_URL = (import.meta.env.VITE_API_URL || "https://imi-backend-s85v.onrender.com/api").replace(/\/+$/, "");
   try {
     const blob = new Blob([JSON.stringify(event)], { type: "application/json" });
     navigator.sendBeacon(`${API_URL}/analytics/track`, blob);

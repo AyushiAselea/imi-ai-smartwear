@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+// Trim trailing slash to prevent double-slash URLs like //products
+const API_URL = (import.meta.env.VITE_API_URL || "https://imi-backend-s85v.onrender.com/api").replace(/\/+$/, "");
 
 interface RequestOptions {
   method?: string;
