@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import featureVoice from "@/assets/feature-voice.jpg";
+import featureVoice from "@/assets/new.jpeg";
 import featureVision from "@/assets/feature-vision.jpeg";
 import featureCapture from "@/assets/feature-capture.jpeg";
 import featureAi from "@/assets/feature-ai.jpeg";
