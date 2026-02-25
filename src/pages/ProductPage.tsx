@@ -7,8 +7,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import mark1Img from "@/assets/mark1-glasses.jpg";
 import mark2Img from "@/assets/mark2-glasses.png";
-import mark1Video from "@/assets/imi_ved2.mp4";
-import mark2Video from "@/assets/imi_ved3.mp4";
+
+const mark1Video = "/videos/imi_ved2.mp4";
+const mark2Video = "/videos/imi_ved3.mp4";
 import { startPayment } from "@/lib/payment";
 import { updateCart } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";

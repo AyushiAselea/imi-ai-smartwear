@@ -1,16 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from "lucide-react";
-import ved1 from "@/assets/imi ved3.mp4";
-import ved2 from "@/assets/imi_ved2.mp4";
-import ved3 from "@/assets/imi_ved3.mp4";
-import ved4 from "@/assets/imi_ved4.mp4";
 
 const videos = [
-  { src: ved1, title: "IMI in Action" },
-  { src: ved2, title: "Smart Features" },
-  { src: ved3, title: "AI Vision" },
-  { src: ved4, title: "Everyday Style" },
+  { src: "/videos/imi_ved1.mp4", title: "IMI in Action" },
+  { src: "/videos/imi_ved2.mp4", title: "Smart Features" },
+  { src: "/videos/imi_ved3.mp4", title: "AI Vision" },
+  { src: "/videos/imi_ved4.mp4", title: "Everyday Style" },
 ];
 
 const VideoCarousel = () => {
