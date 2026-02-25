@@ -3,10 +3,9 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from "lucide-react";
 
 const videos = [
-  { src: "/dist/videos/imi_ved1.mp4", title: "IMI in Action" },
-  { src: "/dist/videos/imi_ved2.mp4", title: "Smart Features" },
-  { src: "/dist/videos/imi_ved3.mp4", title: "AI Vision" },
-  { src: "/dist/videos/imi_ved4.mp4", title: "Everyday Style" },
+  { src: "/videos/imi_ved2.mp4", title: "IMI in Action" },
+  { src: "/videos/imi_ved3.mp4", title: "Smart Features" },
+  { src: "/videos/imi_ved4.mp4", title: "AI Vision" },
 ];
 
 const VideoCarousel = () => {
