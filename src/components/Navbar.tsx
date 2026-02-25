@@ -24,7 +24,7 @@ const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
-          <a href="/#products" className="hover:text-foreground transition-colors">Products</a>
+          <a href="/#products" className="hover:text-foreground transition-colors">Home</a>
           <a href="/#features" className="hover:text-foreground transition-colors">Features</a>
           <a href="/#compare" className="hover:text-foreground transition-colors">Compare</a>
           <a href="/#why" className="hover:text-foreground transition-colors">Why IMI</a>
@@ -90,7 +90,7 @@ const Navbar = () => {
               )}
             </>
           )}
-          <Link to="/product/mark-1" className="px-5 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
+          <Link to="/shop" className="px-5 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity">
             Shop Now
           </Link>
         </div>
@@ -160,7 +160,7 @@ const Navbar = () => {
                   </Link>
                 )
               )}
-              <Link to="/product/mark-1" onClick={() => setOpen(false)} className="px-5 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground text-center">Shop Now</Link>
+              <Link to="/shop" onClick={() => setOpen(false)} className="px-5 py-2.5 text-sm font-semibold rounded-full bg-primary text-primary-foreground text-center">Shop Now</Link>
             </div>
           </motion.div>
         )}
