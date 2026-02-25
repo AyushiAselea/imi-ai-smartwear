@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play } from "lucide-react";
@@ -9,6 +9,11 @@ import mark1Img from "@/assets/mark1-glasses.jpg";
 import mark2Img from "@/assets/mark2-glasses.png";
 import mark1Video from "@/assets/mark 1.mp4";
 import mark2Video from "@/assets/mark 2.mp4";
+import { startPayment } from "@/lib/payment";
+import { updateCart } from "@/lib/api";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import { useProducts } from "@/hooks/useProducts";
 
 interface Variant {
   id: string;
@@ -84,9 +89,80 @@ const badges = [
 
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const product = slug ? productData[slug] : null;
   const [selectedVariant, setSelectedVariant] = useState("black");
   const [showVideo, setShowVideo] = useState(false);
+  const [buyingLoading, setBuyingLoading] = useState(false);
+  const { user } = useAuth();
+  const { products: backendProducts } = useProducts();
+
+  // Find matching backend product by name for payment integration
+  const getBackendProductId = (): string | null => {
+    if (!product || backendProducts.length === 0) return null;
+    const match = backendProducts.find(
+      (bp) => bp.name.toLowerCase().includes(product.name.toLowerCase().replace("imi ", ""))
+        || bp.name.toLowerCase() === product.name.toLowerCase()
+    );
+    return match ? match._id : null;
+  };
+
+  // Track abandoned cart when user views a product
+  useEffect(() => {
+    if (product) {
+      const sessionId = sessionStorage.getItem("imi_session_id") || `s_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      if (!sessionStorage.getItem("imi_session_id")) {
+        sessionStorage.setItem("imi_session_id", sessionId);
+      }
+      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
+      updateCart({
+        sessionId,
+        userId: user?.id,
+        email: user?.email || "",
+        products: [
+          {
+            productId: slug || "",
+            name: product.name,
+            price: priceNum,
+            quantity: 1,
+            image: product.image,
+          },
+        ],
+        totalAmount: priceNum,
+      });
+    }
+  }, [slug, product, user]);
+
+  const handleBuyNow = async () => {
+    if (!user) {
+      toast.info("Please sign in to continue with purchase");
+      navigate("/auth");
+      return;
+    }
+
+    const token = localStorage.getItem("imi_token") || "";
+    if (!token) {
+      toast.info("Please sign in again to continue");
+      navigate("/auth");
+      return;
+    }
+
+    setBuyingLoading(true);
+    try {
+      const sessionId = sessionStorage.getItem("imi_session_id") || "";
+      // Use backend product ID if available, otherwise pass inline details
+      const backendProductId = getBackendProductId();
+      const priceNum = parseInt(product!.price.replace(/[₹,]/g, ""));
+      const payload = backendProductId
+        ? { productId: backendProductId }
+        : { productName: product!.name, price: priceNum };
+      await startPayment(payload, 1, token, sessionId);
+      // startPayment redirects to PayU — code below won't execute
+    } catch (err: any) {
+      toast.error(err.message || "Payment failed. Please try again.");
+      setBuyingLoading(false);
+    }
+  };
 
   if (!product) {
     return (
@@ -201,8 +277,12 @@ const ProductPage = () => {
               </div>
 
               {/* Buy Button */}
-              <button className="w-full py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity">
-                Buy Now — {product.price}
+              <button
+                onClick={handleBuyNow}
+                disabled={buyingLoading}
+                className="w-full py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
               </button>
 
               {/* Trust Badges */}

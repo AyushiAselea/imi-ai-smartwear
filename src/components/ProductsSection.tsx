@@ -2,8 +2,11 @@ import { motion } from "framer-motion";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database } from "lucide-react";
 import mark1Img from "@/assets/mark1-glasses.jpg";
 import mark2Img from "@/assets/mark2-glasses.png";
+import { useProducts } from "@/hooks/useProducts";
+import type { Product } from "@/lib/api";
 
-const products = [
+// Static fallback products (used when backend has no products)
+const staticProducts = [
   {
     name: "IMI Mark 1",
     tagline: "Smart Everyday AI Glasses",
@@ -17,6 +20,7 @@ const products = [
       { icon: Database, label: "AI Memory" },
     ],
     cta: "Buy Mark 1",
+    link: "/product/mark-1",
   },
   {
     name: "IMI Mark 2",
@@ -33,8 +37,27 @@ const products = [
       { icon: Database, label: "Personal AI Memory" },
     ],
     cta: "Buy Mark 2",
+    link: "/product/mark-2",
   },
 ];
+
+// Map icon name strings from backend to icon components
+const iconMap: Record<string, any> = { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database };
+
+function mapBackendProduct(p: Product) {
+  return {
+    _id: p._id,
+    name: p.name,
+    tagline: p.category || "",
+    description: p.description,
+    image: p.image || p.images?.[0] || "",
+    features: [] as { icon: any; label: string }[],
+    cta: `Buy ${p.name}`,
+    link: `/product/${p._id}`,
+    premium: (p.category || "").toLowerCase().includes("premium"),
+    price: p.price,
+  };
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -46,6 +69,13 @@ const fadeUp = {
 };
 
 const ProductsSection = () => {
+  const { products: backendProducts, loading } = useProducts();
+
+  // Use backend products if available, otherwise fall back to static
+  const displayProducts = backendProducts.length > 0
+    ? backendProducts.map(mapBackendProduct)
+    : staticProducts;
+
   return (
     <section id="products" className="section-padding">
       <div className="max-w-7xl mx-auto">
@@ -64,7 +94,7 @@ const ProductsSection = () => {
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-8">
-          {products.map((product, i) => (
+          {displayProducts.map((product, i) => (
             <motion.div
               key={product.name}
               custom={i}
@@ -90,17 +120,23 @@ const ProductsSection = () => {
               <p className="text-primary text-sm font-medium mb-3">{product.tagline}</p>
               <p className="text-muted-foreground text-sm mb-6">{product.description}</p>
 
-              <div className="grid grid-cols-1 gap-3 mb-8 flex-1">
-                {product.features.map((f) => (
-                  <div key={f.label} className="flex items-center gap-3 text-sm">
-                    <f.icon size={16} className="text-primary shrink-0" />
-                    <span className="text-foreground/80">{f.label}</span>
-                  </div>
-                ))}
-              </div>
+              {product.features.length > 0 && (
+                <div className="grid grid-cols-1 gap-3 mb-8 flex-1">
+                  {product.features.map((f: any) => (
+                    <div key={f.label} className="flex items-center gap-3 text-sm">
+                      <f.icon size={16} className="text-primary shrink-0" />
+                      <span className="text-foreground/80">{f.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {"price" in product && product.price && (
+                <p className="text-lg font-bold text-foreground mb-4">₹{product.price.toLocaleString("en-IN")}</p>
+              )}
 
               <a
-                href={product.premium ? "/product/mark-2" : "/product/mark-1"}
+                href={product.link || (product.premium ? "/product/mark-2" : "/product/mark-1")}
                 className={`block text-center py-3 rounded-full font-semibold text-sm transition-opacity hover:opacity-90 ${
                   product.premium
                     ? "bg-primary text-primary-foreground"

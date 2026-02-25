@@ -6,6 +6,7 @@ import { signInWithPopup } from "firebase/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { syncSocialUser } from "@/lib/api";
 import { toast } from "sonner";
 import { useTheme } from "@/hooks/useTheme";
 import logoWhite from "@/assets/new Final IMI LOGO.png";
@@ -59,8 +60,16 @@ const Auth = () => {
     setGoogleLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      const idToken = await result.user.getIdToken();
-      // Sign into Supabase with the Firebase token or just navigate
+      // Sync with backend to get JWT for payment flow
+      const email = result.user.email;
+      if (email) {
+        try {
+          const res = await syncSocialUser(email, result.user.displayName || undefined, "google");
+          localStorage.setItem("imi_token", res.token);
+        } catch {
+          // Non-blocking: payment will handle missing token
+        }
+      }
       toast.success(`Welcome, ${result.user.displayName || result.user.email}!`);
       navigate("/");
     } catch (error: any) {

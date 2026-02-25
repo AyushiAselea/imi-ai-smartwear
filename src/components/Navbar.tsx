@@ -9,6 +9,8 @@ import logoBlack from "@/assets/WhatsApp Image 2025-09-08 at 6.23.45 PM.png";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -39,16 +41,44 @@ const Navbar = () => {
           {!loading && (
             <>
               {user ? (
-                <>
-                  <span className="text-xs text-muted-foreground truncate max-w-[140px]">{user.email}</span>
+                <div className="relative">
                   <button
-                    onClick={signOut}
-                    className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+                    onClick={() => setDropdownOpen((v) => !v)}
+                    title={user.displayName || user.email || undefined}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary border border-border hover:bg-secondary/80 transition-colors"
                   >
-                    <LogOut size={14} />
-                    Logout
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
+                      {(user.displayName || user.email || "U")[0].toUpperCase()}
+                    </div>
+                    <svg className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${dropdownOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
                   </button>
-                </>
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setDropdownOpen(false)} />
+                        <motion.div
+                          initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute right-0 mt-2 w-44 rounded-xl bg-card border border-border shadow-xl overflow-hidden z-50"
+                        >
+                          <div className="px-4 py-3 border-b border-border">
+                            <p className="text-xs text-muted-foreground">Signed in as</p>
+                            <p className="text-sm font-semibold text-foreground truncate">{user.displayName || user.email}</p>
+                          </div>
+                          <button
+                            onClick={() => { signOut(); setDropdownOpen(false); }}
+                            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
+                          >
+                            <LogOut size={14} />
+                            Logout
+                          </button>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
               ) : (
                 <Link
                   to="/auth"
@@ -94,9 +124,36 @@ const Navbar = () => {
               <a href="/#why" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground">Why IMI</a>
               {!loading && (
                 user ? (
-                  <button onClick={() => { signOut(); setOpen(false); }} className="text-left text-muted-foreground hover:text-foreground flex items-center gap-2">
-                    <LogOut size={14} /> Logout
-                  </button>
+                  <div className="flex items-center justify-between">
+                    <div className="relative">
+                      <button
+                        onClick={() => setMobileDropdownOpen((v) => !v)}
+                        className="flex items-center gap-2"
+                        title={user.displayName || user.email || undefined}
+                      >
+                        <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">
+                          {(user.displayName || user.email || "U")[0].toUpperCase()}
+                        </div>
+                      </button>
+                      <AnimatePresence>
+                        {mobileDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            className="absolute left-0 mt-2 w-40 rounded-md bg-card border border-border shadow-md z-40 overflow-hidden"
+                          >
+                            <button
+                              onClick={() => { signOut(); setOpen(false); setMobileDropdownOpen(false); }}
+                              className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10"
+                            >
+                              <LogOut size={14} className="inline mr-2" /> Logout
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
                 ) : (
                   <Link to="/auth" onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground flex items-center gap-2">
                     <User size={14} /> Sign In
