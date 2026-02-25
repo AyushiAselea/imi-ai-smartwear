@@ -6,7 +6,7 @@ import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, C
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import mark1Img from "@/assets/mark1-glasses.jpg";
-import mark2Img from "@/assets/mark2-glasses.jpg";
+import mark2Img from "@/assets/mark2-glasses.png";
 import mark1Video from "@/assets/mark 1.mp4";
 import mark2Video from "@/assets/mark 2.mp4";
 

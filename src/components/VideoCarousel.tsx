@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Play, Pause } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Volume2, VolumeX } from "lucide-react";
 import ved1 from "@/assets/imi ved1.mp4";
 import ved2 from "@/assets/imi ved2.mp4";
 import ved3 from "@/assets/imi ved3.mp4";
@@ -14,35 +14,48 @@ const videos = [
 ];
 
 const VideoCarousel = () => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [playingIndex, setPlayingIndex] = useState<number | null>(null);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const scroll = (dir: "left" | "right") => {
-    if (scrollRef.current) {
-      const amount = scrollRef.current.offsetWidth * 0.75;
-      scrollRef.current.scrollBy({
-        left: dir === "left" ? -amount : amount,
-        behavior: "smooth",
-      });
-    }
+  // When video ends, go to next
+  const handleVideoEnd = () => {
+    setDirection(1);
+    setActiveIndex((prev) => (prev + 1) % videos.length);
   };
 
-  const togglePlay = (index: number) => {
-    const video = videoRefs.current[index];
-    if (!video) return;
+  const goTo = (index: number) => {
+    setDirection(index >= activeIndex ? 1 : -1);
+    setActiveIndex(index);
+  };
 
-    if (playingIndex === index) {
-      video.pause();
-      setPlayingIndex(null);
-    } else {
-      // Pause any currently playing video
-      if (playingIndex !== null && videoRefs.current[playingIndex]) {
-        videoRefs.current[playingIndex]!.pause();
-      }
-      video.play();
-      setPlayingIndex(index);
+  const handleNav = (dir: 1 | -1) => {
+    setDirection(dir);
+    setActiveIndex((prev) => (prev + dir + videos.length) % videos.length);
+  };
+
+  // Play video when activeIndex changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isMuted;
+      videoRef.current.play().catch(() => {});
     }
+  }, [activeIndex, isMuted]);
+
+  // Toggle mute on the current video
+  const toggleMute = () => {
+    setIsMuted((prev) => {
+      const next = !prev;
+      if (videoRef.current) videoRef.current.muted = next;
+      return next;
+    });
+  };
+
+  const variants = {
+    enter: (dir: number) => ({ x: dir > 0 ? "100%" : "-100%", opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? "-100%" : "100%", opacity: 0 }),
   };
 
   return (
@@ -62,67 +75,102 @@ const VideoCarousel = () => {
           </p>
         </motion.div>
 
-        <div className="relative">
-          {/* Scroll buttons */}
+        <div className="relative max-w-3xl mx-auto">
+          {/* Prev */}
           <button
-            onClick={() => scroll("left")}
-            className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-card border border-border text-foreground hover:bg-secondary transition-colors shadow-lg"
-            aria-label="Scroll left"
+            onClick={() => handleNav(-1)}
+            className="absolute -left-5 top-1/2 -translate-y-1/2 z-10 p-2.5 rounded-full bg-card border border-border text-foreground hover:bg-secondary transition-colors shadow-lg"
+            aria-label="Previous video"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={22} />
           </button>
+          {/* Next */}
           <button
-            onClick={() => scroll("right")}
-            className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-card border border-border text-foreground hover:bg-secondary transition-colors shadow-lg"
-            aria-label="Scroll right"
+            onClick={() => handleNav(1)}
+            className="absolute -right-5 top-1/2 -translate-y-1/2 z-10 p-2.5 rounded-full bg-card border border-border text-foreground hover:bg-secondary transition-colors shadow-lg"
+            aria-label="Next video"
           >
-            <ChevronRight size={24} />
+            <ChevronRight size={22} />
           </button>
 
-          <div
-            ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {videos.map((video, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative flex-shrink-0 w-[80vw] sm:w-[60vw] md:w-[45vw] lg:w-[30vw] snap-center rounded-2xl overflow-hidden border border-border bg-card group"
+          {/* Video window */}
+          <div className="rounded-2xl overflow-hidden border border-primary/30 shadow-xl bg-black">
+            <div className="relative aspect-video overflow-hidden">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.video
+                  key={activeIndex}
+                  ref={videoRef}
+                  src={videos[activeIndex].src}
+                  custom={direction}
+                  variants={variants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  autoPlay
+                  muted={isMuted}
+                  playsInline
+                  onEnded={handleVideoEnd}
+                />
+              </AnimatePresence>
+
+              {/* Sound toggle */}
+              <button
+                onClick={toggleMute}
+                className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-colors"
+                aria-label={isMuted ? "Unmute" : "Mute"}
               >
-                <div className="relative aspect-[9/16] sm:aspect-video">
-                  <video
-                    ref={(el) => { videoRefs.current[i] = el; }}
-                    src={video.src}
-                    className="w-full h-full object-cover"
-                    loop
-                    muted
-                    playsInline
-                    preload="metadata"
-                    onEnded={() => setPlayingIndex(null)}
-                  />
-                  {/* Play/Pause overlay */}
-                  <button
-                    onClick={() => togglePlay(i)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-label={playingIndex === i ? "Pause video" : "Play video"}
-                  >
-                    <div className="p-4 rounded-full bg-white/20 backdrop-blur-sm">
-                      {playingIndex === i ? (
-                        <Pause size={32} className="text-white" />
-                      ) : (
-                        <Play size={32} className="text-white" />
-                      )}
-                    </div>
-                  </button>
-                </div>
-                <div className="p-4">
-                  <p className="text-sm font-semibold text-foreground">{video.title}</p>
-                </div>
-              </motion.div>
+                {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </button>
+            </div>
+
+            {/* Title bar */}
+            <div className="px-5 py-3 flex items-center justify-between bg-card/80 backdrop-blur-sm">
+              <span className="text-sm font-semibold text-foreground">
+                {videos[activeIndex].title}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {activeIndex + 1} / {videos.length}
+              </span>
+            </div>
+          </div>
+
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-2 mt-6">
+            {videos.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`h-2 rounded-full transition-all duration-300 ${
+                  i === activeIndex
+                    ? "w-8 bg-primary"
+                    : "w-2 bg-border hover:bg-muted-foreground"
+                }`}
+                aria-label={`Go to video ${i + 1}`}
+              />
+            ))}
+          </div>
+
+          {/* Thumbnail strip */}
+          <div className="grid grid-cols-4 gap-3 mt-6">
+            {videos.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                className={`rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                  i === activeIndex
+                    ? "border-primary scale-105 shadow-md"
+                    : "border-border opacity-60 hover:opacity-90"
+                }`}
+              >
+                <video
+                  src={v.src}
+                  className="w-full aspect-video object-cover pointer-events-none"
+                  muted
+                  preload="metadata"
+                />
+              </button>
             ))}
           </div>
         </div>

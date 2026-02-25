@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database } from "lucide-react";
 import mark1Img from "@/assets/mark1-glasses.jpg";
-import mark2Img from "@/assets/mark2-glasses.jpg";
+import mark2Img from "@/assets/mark2-glasses.png";
 
 const products = [
   {
