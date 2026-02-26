@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAnalytics, isSupported, setAnalyticsCollectionEnabled } from "firebase/analytics";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,9 +16,14 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Analytics only loads in supported browser environments
+// Analytics: disable Firebase Analytics since we already load gtag manually in index.html
+// This prevents the "deprecated parameters" warning from feature_collector.js
 isSupported().then((supported) => {
-  if (supported) getAnalytics(app);
+  if (supported) {
+    const analytics = getAnalytics(app);
+    // We manage GA4 via the gtag script in index.html — disable duplicate collection
+    setAnalyticsCollectionEnabled(analytics, false);
+  }
 });
 
 export default app;
