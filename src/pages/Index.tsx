@@ -15,7 +15,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>AI Smart Glasses in India | IMI Mark 1 & Mark 2</title>
+        <title>IMI | AI Smart Glasses India</title>
         <meta
           name="description"
           content="Discover IMI AI smart glasses with voice assistant, camera, calling, and vision AI. Affordable wearable tech built for the future."
@@ -27,10 +27,11 @@ const Index = () => {
         <HeroSection />
         <VideoCarousel />
         <ProductsSection />
-        <FeaturesSection />
-        <ComparisonSection />
-        <WhyImiSection />
         <TestimonialsSection />
+        <ComparisonSection />
+        <FeaturesSection />
+        <WhyImiSection />
+        
         <CtaSection />
       </main>
       <Footer />

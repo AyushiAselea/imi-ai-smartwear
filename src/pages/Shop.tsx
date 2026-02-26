@@ -1,15 +1,16 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import { useEffect } from "react";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-import mark1Img from "@/assets/mark1-glasses.jpg";
-import mark1WhiteImg from "@/assets/mark_1_white.png";
+import mark1Img from "@/assets/mark1-glasses.jpeg";
+import mark1WhiteImg from "@/assets/mark_1_white.jpeg";
 import mark2Img from "@/assets/mark2-glasses.png";
-import mark2WhiteImg from "@/assets/mark2_white.png";
-import mark2BlueImg from "@/assets/mark2_blue.png";
+import mark2WhiteImg from "@/assets/mark2_white.jpeg";
+import mark2BlueImg from "@/assets/mark2_blue.jpeg";
 
 interface ProductCard {
   slug: string;
@@ -33,7 +34,7 @@ const allProducts: ProductCard[] = [
     variant: "Matte Black",
     variantColor: "bg-gray-900",
     tagline: "Smart Everyday AI Glasses",
-    price: "₹3,999",
+    price: "₹2,499",
     originalPrice: "₹5,999",
     image: mark1Img,
     features: [
@@ -50,7 +51,7 @@ const allProducts: ProductCard[] = [
     variant: "Pearl White",
     variantColor: "bg-white border border-gray-300",
     tagline: "Smart Everyday AI Glasses",
-    price: "₹3,999",
+    price: "₹2,499",
     originalPrice: "₹5,999",
     image: mark1WhiteImg,
     features: [
@@ -68,8 +69,8 @@ const allProducts: ProductCard[] = [
     variant: "Matte Black",
     variantColor: "bg-gray-900",
     tagline: "Advanced Vision AI Smart Glasses",
-    price: "₹6,999",
-    originalPrice: "₹9,999",
+    price: "₹11,999",
+    originalPrice: "₹14,999",
     image: mark2Img,
     premium: true,
     features: [
@@ -87,8 +88,8 @@ const allProducts: ProductCard[] = [
     variant: "Pearl White",
     variantColor: "bg-white border border-gray-300",
     tagline: "Advanced Vision AI Smart Glasses",
-    price: "₹6,999",
-    originalPrice: "₹9,999",
+    price: "₹11,999",
+    originalPrice: "₹14,999",
     image: mark2WhiteImg,
     premium: true,
     features: [
@@ -106,8 +107,8 @@ const allProducts: ProductCard[] = [
     variant: "Ocean Blue",
     variantColor: "bg-blue-600",
     tagline: "Advanced Vision AI Smart Glasses",
-    price: "₹6,999",
-    originalPrice: "₹9,999",
+    price: "₹11,999",
+    originalPrice: "₹14,999",
     image: mark2BlueImg,
     premium: true,
     features: [
@@ -150,6 +151,10 @@ const fadeUp = {
 };
 
 const Shop = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   return (
     <>
       <Helmet>
@@ -157,7 +162,7 @@ const Shop = () => {
         <meta name="description" content="Browse all IMI smart glasses — Mark 1, Mark 2, and the upcoming Mark 2 Pro. Find the perfect AI eyewear for your lifestyle." />
       </Helmet>
       <Navbar />
-      <main className="pt-24 pb-16 px-6">
+      <main className="pt-32 pb-16 px-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <motion.div
@@ -334,8 +339,13 @@ const ProductCardItem = ({ product, index }: { product: ProductCard; index: numb
 
   if (isUpcoming) return cardContent;
 
+  // Map variant display name to URL variant ID
+  const variantId = product.variant === "Pearl White" ? "white"
+    : product.variant === "Ocean Blue" ? "blue"
+    : "black";
+
   return (
-    <Link to={`/product/${product.slug}`}>
+    <Link to={`/product/${product.slug}?variant=${variantId}`}>
       {cardContent}
     </Link>
   );

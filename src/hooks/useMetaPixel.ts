@@ -11,23 +11,21 @@ declare global {
 const META_PIXEL_ID = "1268905655168324";
 
 /**
- * Loads Meta Pixel ONLY when the user is on the Mark 1 product page (/product/mark-1).
- * Cleans up when navigating away. Does NOT render any UI.
+ * Loads Meta Pixel on ALL pages and fires PageView on every route change.
+ * Initializes the SDK once, then tracks subsequent navigations.
  */
 export function useMetaPixel(): void {
   const location = useLocation();
   const scriptRef = useRef<HTMLScriptElement | null>(null);
   const noscriptRef = useRef<HTMLElement | null>(null);
+  const initializedRef = useRef(false);
 
+  // Initialize the pixel SDK once
   useEffect(() => {
-    const isMark1Page = location.pathname === "/product/mark-1";
-
-    if (isMark1Page) {
-      // Avoid re-initializing if already loaded
-      if (window.fbq) {
-        window.fbq("track", "PageView");
-        return;
-      }
+    if (initializedRef.current || window.fbq) {
+      return;
+    }
+    initializedRef.current = true;
 
       // Initialize fbq
       const n: any = (window.fbq = function () {
@@ -59,11 +57,10 @@ export function useMetaPixel(): void {
       document.body.appendChild(noscript);
       noscriptRef.current = noscript;
 
-      window.fbq("init", META_PIXEL_ID);
-      window.fbq("track", "PageView");
-    }
+    window.fbq("init", META_PIXEL_ID);
+    window.fbq("track", "PageView");
 
-    // Cleanup when navigating away from Mark 1 page
+    // Cleanup only on unmount (app-level)
     return () => {
       if (scriptRef.current) {
         scriptRef.current.remove();
@@ -74,5 +71,12 @@ export function useMetaPixel(): void {
         noscriptRef.current = null;
       }
     };
+  }, []);
+
+  // Fire PageView on every route change
+  useEffect(() => {
+    if (window.fbq) {
+      window.fbq("track", "PageView");
+    }
   }, [location.pathname]);
 }

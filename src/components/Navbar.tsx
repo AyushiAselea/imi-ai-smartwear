@@ -1,11 +1,38 @@
 import { useState } from "react";
-import { Menu, X, User, LogOut, Sun, Moon } from "lucide-react";
+import { Menu, X, User, LogOut, Sun, Moon, ShoppingCart } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useCart } from "@/hooks/useCart";
 import logoWhite from "@/assets/new Final IMI LOGO.png";
 import logoBlack from "@/assets/WhatsApp Image 2025-09-08 at 6.23.45 PM.png";
+import logoSmallWhite from "@/assets/new Final IMI LOGO.png";
+
+const BANNER_HEIGHT = "h-9"; // 36px
+
+const PromoBanner = () => (
+  <div className={`fixed top-0 left-0 right-0 z-[60] ${BANNER_HEIGHT} bg-gradient-to-r from-primary via-teal-600 to-primary text-white flex items-center overflow-hidden`}>
+    <div className="animate-marquee whitespace-nowrap flex items-center gap-12 text-sm font-medium">
+      <span className="flex items-center gap-2">
+        🔥 Buy IMI Mark 1 at <strong>₹2,499</strong> — Limited offer for first 100 users!
+      </span>
+      <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
+      <span className="flex items-center gap-2">
+        🔥 Buy IMI Mark 1 at <strong>₹2,499</strong> — Limited offer for first 100 users!
+      </span>
+      <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
+      <span className="flex items-center gap-2">
+        🔥 Buy IMI Mark 1 at <strong>₹2,499</strong> — Limited offer for first 100 users!
+      </span>
+      <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
+      <span className="flex items-center gap-2">
+        🔥 Buy IMI Mark 1 at <strong>₹2,499</strong> — Limited offer for first 100 users!
+      </span>
+      <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
+    </div>
+  </div>
+);
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -13,11 +40,14 @@ const Navbar = () => {
   const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false);
   const { user, loading, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { itemCount } = useCart();
 
   const logo = theme === "dark" ? logoWhite : logoBlack;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass">
+    <>
+    <PromoBanner />
+    <nav className="fixed top-9 left-0 right-0 z-50 glass">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
         <Link to="/" className="flex items-center">
           <img src={logo} alt="IMI" className="h-8 w-auto" />
@@ -38,6 +68,18 @@ const Navbar = () => {
           >
             {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
           </button>
+          <Link
+            to="/cart"
+            className="relative p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={16} />
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            )}
+          </Link>
           {!loading && (
             <>
               {user ? (
@@ -96,6 +138,18 @@ const Navbar = () => {
         </div>
 
         <div className="flex md:hidden items-center gap-2">
+          <Link
+            to="/cart"
+            className="relative p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
+            aria-label="Cart"
+          >
+            <ShoppingCart size={18} />
+            {itemCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] rounded-full bg-primary text-primary-foreground text-[10px] font-bold flex items-center justify-center px-1">
+                {itemCount > 99 ? "99+" : itemCount}
+              </span>
+            )}
+          </Link>
           <button
             onClick={toggleTheme}
             className="p-2 rounded-full border border-border text-foreground hover:bg-secondary transition-colors"
@@ -166,6 +220,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
     </nav>
+    </>
   );
 };
 

@@ -1,19 +1,34 @@
 import { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play, X } from "lucide-react";
+import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play, X, MessageSquare, CloudSun, Newspaper, MapPin, FileText, Send, StickyNote, HelpCircle, Save, History, User, Video, Image, ScanSearch, Radio, ShoppingCart } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import mark1Img from "@/assets/mark1-glasses.jpg";
+import mark1Img from "@/assets/mark1-glasses.jpeg";
+import mark1WhiteImg from "@/assets/mark_1_white.jpeg";
 import mark2Img from "@/assets/mark2-glasses.png";
+import mark2WhiteImg from "@/assets/mark2_white.jpeg";
+import mark2BlueImg from "@/assets/mark2_blue.jpeg";
+
+// Gallery images for Mark 1 & Mark 2 showcase
+import gallery1 from "@/assets/WhatsApp Image 2026-02-25 at 7.34.08 PM.jpeg";
+import gallery3 from "@/assets/WhatsApp Image 2026-02-25 at 7.34.53 PM.jpeg";
+import gallery4 from "@/assets/WhatsApp Image 2026-02-25 at 7.35.03 PM.jpeg";
+import mark2Gallery1 from "@/assets/mark_2_1.jpeg";
+import mark2Gallery2 from "@/assets/mark_2_2.jpeg";
+import mark2Gallery3 from "@/assets/mark_2_3.jpeg";
+
+const mark1Gallery = [gallery1, gallery4, gallery3];
+const mark2Gallery = [mark2Gallery1, mark2Gallery2, mark2Gallery3];
 const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
-const mark1Video = `${CLD}/imi_ved2_akl631.mp4`;
-const mark2Video = `${CLD}/imi_ved3_vnjdl5.mp4`;
+const mark1Video = `${CLD}/13_nov_imi_reel_2_vacfxr.mp4`;
+const mark2Video = `https://res.cloudinary.com/dvvifezwm/video/upload/v1772089510/30_oct_reel_2_h4vt3k.mp4`;
 import { startPayment } from "@/lib/payment";
 import { updateCart, syncSocialUser } from "@/lib/api";
 import type { ShippingAddress } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
 
@@ -22,6 +37,18 @@ interface Variant {
   label: string;
   color: string;
   colorHex: string;
+  image: string;
+}
+
+interface FeatureCategory {
+  title: string;
+  emoji: string;
+  features: { icon: any; label: string }[];
+}
+
+interface TechSpec {
+  label: string;
+  value: string;
 }
 
 interface ProductInfo {
@@ -35,6 +62,9 @@ interface ProductInfo {
   premium?: boolean;
   variants: Variant[];
   features: { icon: any; label: string }[];
+  featureCategories: FeatureCategory[];
+  technicalOverview: string;
+  techSpecs: TechSpec[];
 }
 
 const productData: Record<string, ProductInfo> = {
@@ -42,13 +72,13 @@ const productData: Record<string, ProductInfo> = {
     name: "IMI Mark 1",
     tagline: "Smart Everyday AI Glasses",
     description: "Affordable AI glasses built for everyday smart lifestyle. Voice-activated, AI-powered, and designed for the modern Indian user.",
-    price: "₹3,999",
+    price: "₹2,499",
     originalPrice: "₹5,999",
     image: mark1Img,
     video: mark1Video,
     variants: [
-      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111" },
-      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5" },
+      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111", image: mark1Img },
+      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5", image: mark1WhiteImg },
     ],
     features: [
       { icon: Mic, label: 'Voice Activation ("Hey IMI")' },
@@ -57,19 +87,64 @@ const productData: Record<string, ProductInfo> = {
       { icon: Music, label: "Instant Music" },
       { icon: Database, label: "AI Memory" },
     ],
+    technicalOverview: "The IMI MARK I Smart Glasses by IMI WEARABLES are advanced Bluetooth-enabled AI smart glasses designed for seamless connectivity and daily convenience. These stylish glasses feature Type-C charging and come equipped with dual 55mAh batteries for long-lasting performance. Built with a durable PVC frame and life waterproof design, they are ideal for everyday use. Powered by the Hyper MZT app, the MARK I Smart Glasses offer App Control functionality, enabling users to manage multiple smart features effortlessly. Key functions include wireless calling, music playback, voice assistant integration, real-time AI translation, weather updates, gaming support, and even a remote camera feature. Perfect for multitaskers and tech enthusiasts, these glasses combine style, innovation, and practicality — delivering a truly smart wearable experience in a sleek, modern design.",
+    techSpecs: [
+      { label: "Product Type", value: "AI Smart Glasses (App Controlled)" },
+      { label: "Battery", value: "55mAh + 55mAh" },
+      { label: "Charging", value: "Type-C" },
+      { label: "Frame Material", value: "PVC" },
+      { label: "Package Size", value: "19 × 8 × 7 cm" },
+      { label: "Gross Weight", value: "0.350 kg" },
+      { label: "Connectivity", value: "Bluetooth" },
+      { label: "App", value: "Hyper MZT" },
+      { label: "Water Resistance", value: "Life Waterproof" },
+      { label: "Key Features", value: "Speaker, AI Assistant, Real-time Translation, Waterproof Design" },
+    ],
+    featureCategories: [
+      {
+        title: "Voice / Audio Features",
+        emoji: "🎤",
+        features: [
+          { icon: Mic, label: 'Wake Up AI – Say "Hey Imi"' },
+          { icon: Brain, label: "Chat with AI (Gemini Live) – Real-time voice conversation" },
+          { icon: Music, label: "Play Music – \"Play a song\"" },
+          { icon: Play, label: "Open YouTube – \"Open YouTube\"" },
+          { icon: Phone, label: "Make Calls – \"Call someone\"" },
+          { icon: CloudSun, label: "Weather Info – \"What's the weather?\"" },
+          { icon: Newspaper, label: "Latest News – Ask for current news" },
+          { icon: MapPin, label: "Plan Trips – \"Distance between cities\"" },
+          { icon: FileText, label: "Record Meeting Notes – \"Start meeting minutes\"" },
+          { icon: Send, label: "Send WhatsApp Messages – Auto-send via voice command" },
+          { icon: StickyNote, label: "Quick Notes – Instantly save short voice/text notes" },
+          { icon: HelpCircle, label: "General AI Q&A – Ask anything like a smart assistant" },
+        ],
+      },
+      {
+        title: "Data / Memory Features",
+        emoji: "💾",
+        features: [
+          { icon: Brain, label: "AI Memory System – Learns user preferences" },
+          { icon: History, label: "Chat History Saved – Conversation context remembered" },
+          { icon: Save, label: "Meeting History Stored – Save & review transcriptions" },
+          { icon: StickyNote, label: "Saved Quick Notes – View, edit, or delete anytime" },
+          { icon: User, label: "Personalized Responses – AI adapts to user behavior" },
+        ],
+      },
+    ],
   },
   "mark-2": {
     name: "IMI Mark 2",
     tagline: "Advanced Vision AI Smart Glasses",
     description: "Next-generation AI glasses with camera and visual intelligence. See smarter, capture life, and talk naturally — all hands-free.",
-    price: "₹6,999",
-    originalPrice: "₹9,999",
+    price: "₹11,999",
+    originalPrice: "₹14,999",
     image: mark2Img,
     video: mark2Video,
     premium: true,
     variants: [
-      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111" },
-      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5" },
+      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111", image: mark2Img },
+      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5", image: mark2WhiteImg },
+      { id: "blue", label: "Ocean Blue", color: "bg-blue-600", colorHex: "#2563eb", image: mark2BlueImg },
     ],
     features: [
       { icon: Mic, label: "AI Voice Assistant" },
@@ -78,6 +153,73 @@ const productData: Record<string, ProductInfo> = {
       { icon: Brain, label: "Live AI Chat" },
       { icon: Wifi, label: "Smart Connectivity" },
       { icon: Database, label: "Personal AI Memory" },
+    ],
+    featureCategories: [
+      {
+        title: "Voice / Audio Features",
+        emoji: "🎤",
+        features: [
+          { icon: Mic, label: 'Wake Up AI – Say "Hey Imi"' },
+          { icon: Brain, label: "Chat with AI (Gemini Live) – Real-time voice conversation" },
+          { icon: Music, label: "Play Music – \"Play a song\"" },
+          { icon: Play, label: "Open YouTube – \"Open YouTube\"" },
+          { icon: Phone, label: "Make Calls – \"Call someone\"" },
+          { icon: CloudSun, label: "Weather Info – \"What's the weather?\"" },
+          { icon: Newspaper, label: "Latest News – Ask for current news" },
+          { icon: MapPin, label: "Plan Trips – \"Distance between cities\"" },
+          { icon: FileText, label: "Record Meeting Notes – \"Start meeting minutes\"" },
+          { icon: Send, label: "Send WhatsApp Messages – Auto-send via voice command" },
+          { icon: StickyNote, label: "Quick Notes – Instantly save short voice/text notes" },
+          { icon: HelpCircle, label: "General AI Q&A – Ask anything like a smart assistant" },
+        ],
+      },
+      {
+        title: "Data / Memory Features",
+        emoji: "💾",
+        features: [
+          { icon: Brain, label: "AI Memory System – Learns user preferences" },
+          { icon: History, label: "Chat History Saved – Conversation context remembered" },
+          { icon: Save, label: "Meeting History Stored – Save & review transcriptions" },
+          { icon: StickyNote, label: "Saved Quick Notes – View, edit, or delete anytime" },
+          { icon: User, label: "Personalized Responses – AI adapts to user behavior" },
+        ],
+      },
+      {
+        title: "Capture Features",
+        emoji: "📸",
+        features: [
+          { icon: Camera, label: "Take Photos – Capture images instantly" },
+          { icon: Video, label: "Record Video – Record videos directly from glasses camera" },
+          { icon: Image, label: "View Photos & Videos – Access gallery inside the app" },
+        ],
+      },
+      {
+        title: "Vision AI Features",
+        emoji: "👁️",
+        features: [
+          { icon: ScanSearch, label: "Image Analysis – \"What is in front of me?\"" },
+          { icon: Radio, label: "Live Video Stream Analysis – Real-time scene understanding" },
+          { icon: Eye, label: "Object Recognition – Detect objects or text" },
+          { icon: MessageSquare, label: "Visual Assistance Mode – Describe surroundings" },
+        ],
+      },
+    ],
+    technicalOverview: "IMI AI Glasses are next-generation smart eyewear designed for productivity, convenience, and style. Powered by a JL7018F Stereo ENC processor with Allwinner V821 auxiliary chipset, these glasses deliver fast performance with advanced noise reduction capabilities. Equipped with a Sony 818 8MP HD camera, IMI Glasses capture high-quality photos and videos with exceptional clarity, making them ideal for real-time streaming, documentation, and AI-based features. The glasses include 32GB of built-in memory, providing ample space for recordings and app data. Connectivity is seamless with dual WiFi (5GHz) and Bluetooth, offering a strong and stable range of up to 210 meters. Audio performance is enhanced with 150Ω H3.0 speakers and ENC (Environmental Noise Cancellation), ensuring clear music playback and crystal-clear voice calls. Crafted from premium PC and ABS materials, the frame is both lightweight and durable, weighing only 42.5 grams for extended comfort during daily wear.",
+    techSpecs: [
+      { label: "Processor", value: "JL7018F Stereo ENC + Allwinner V821" },
+      { label: "Camera", value: "Sony 818 8MP HD" },
+      { label: "Storage", value: "32GB Built-in Memory" },
+      { label: "Battery", value: "270mAh Li-Polymer" },
+      { label: "Playback Time", value: "Up to 1.5 hours" },
+      { label: "Charging", value: "Magnetic Type-C (2hr)" },
+      { label: "Connectivity", value: "Dual WiFi (5GHz) + Bluetooth" },
+      { label: "Range", value: "Up to 210 meters" },
+      { label: "Speakers", value: "150Ω H3.0 with ENC" },
+      { label: "Frame Material", value: "PC + ABS" },
+      { label: "Weight", value: "42.5 grams" },
+      { label: "Water Resistance", value: "IP52" },
+      { label: "App", value: "IMI Glasses (Android & iOS)" },
+      { label: "Languages", value: "25+ Real-time Translation" },
     ],
   },
 };
@@ -91,13 +233,27 @@ const badges = [
 
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const product = slug ? productData[slug] : null;
-  const [selectedVariant, setSelectedVariant] = useState("black");
+  const variantParam = searchParams.get("variant");
+  const [selectedVariant, setSelectedVariant] = useState(
+    variantParam && product?.variants.some(v => v.id === variantParam) ? variantParam : "black"
+  );
   const [showVideo, setShowVideo] = useState(false);
   const [buyingLoading, setBuyingLoading] = useState(false);
+  const [addingToCart, setAddingToCart] = useState(false);
   const { user } = useAuth();
+  const { addToCart } = useCart();
   const { products: backendProducts } = useProducts();
+
+  // Scroll to top and update variant when URL changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (variantParam && product?.variants.some(v => v.id === variantParam)) {
+      setSelectedVariant(variantParam);
+    }
+  }, [slug, variantParam]);
 
   // ── Checkout modal state ──
   const [showCheckout, setShowCheckout] = useState(false);
@@ -113,6 +269,11 @@ const ProductPage = () => {
     postalCode: "",
     country: "India",
   });
+
+  // Derive current image from selected variant
+  const currentImage = product
+    ? (product.variants.find((v) => v.id === selectedVariant)?.image || product.image)
+    : "";
 
   // Find matching backend product by name for payment integration
   const getBackendProductId = (): string | null => {
@@ -142,7 +303,7 @@ const ProductPage = () => {
             name: product.name,
             price: priceNum,
             quantity: 1,
-            image: product.image,
+            image: currentImage,
           },
         ],
         totalAmount: priceNum,
@@ -249,7 +410,7 @@ const ProductPage = () => {
         <meta name="description" content={product.description} />
       </Helmet>
       <Navbar />
-      <main className="pt-24 pb-16 px-6">
+      <main className="pt-32 pb-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* Product Image / Video */}
@@ -257,7 +418,7 @@ const ProductPage = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="sticky top-28 space-y-4"
+              className="sticky top-36 space-y-4"
             >
               <div className={`rounded-2xl overflow-hidden ${product.premium ? "glow-border" : "border border-border"}`}>
                 {showVideo ? (
@@ -270,7 +431,7 @@ const ProductPage = () => {
                   />
                 ) : (
                   <img
-                    src={product.image}
+                    src={currentImage}
                     alt={`${product.name} - ${product.tagline}`}
                     className="w-full aspect-square object-cover"
                   />
@@ -334,7 +495,7 @@ const ProductPage = () => {
 
               {/* Features */}
               <div className="space-y-3 pt-4 border-t border-border">
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Features</h3>
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Key Features</h3>
                 {product.features.map((f: any) => (
                   <div key={f.label} className="flex items-center gap-3 text-sm">
                     <f.icon size={18} className="text-primary shrink-0" />
@@ -343,14 +504,95 @@ const ProductPage = () => {
                 ))}
               </div>
 
-              {/* Buy Button */}
-              <button
-                onClick={handleBuyNow}
-                disabled={buyingLoading}
-                className="w-full py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
-              </button>
+              {/* Detailed Feature Categories */}
+              {product.featureCategories && (
+                <div className="space-y-6 pt-4 border-t border-border">
+                  <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">All Features</h3>
+                  {product.featureCategories.map((cat: any) => (
+                    <details key={cat.title} className="group rounded-xl border border-border bg-card/50 overflow-hidden">
+                      <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-secondary/50 transition-colors">
+                        <span className="text-lg">{cat.emoji}</span>
+                        <span className="font-semibold text-sm text-foreground flex-1">{cat.title}</span>
+                        <span className="text-xs text-muted-foreground group-open:hidden">{cat.features.length} features</span>
+                        <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                      </summary>
+                      <div className="px-5 pb-4 space-y-2.5">
+                        {cat.features.map((f: any) => (
+                          <div key={f.label} className="flex items-start gap-3 text-sm">
+                            <f.icon size={16} className="text-primary shrink-0 mt-0.5" />
+                            <span className="text-foreground/80">{f.label}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              )}
+
+              {/* Technical Overview */}
+              {product.technicalOverview && (
+                <details className="group border border-border rounded-2xl overflow-hidden">
+                  <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer select-none hover:bg-muted/50 transition-colors">
+                    <span className="text-lg">📋</span>
+                    <span className="font-semibold text-sm text-foreground flex-1">Technical Overview</span>
+                    <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </summary>
+                  <div className="px-5 pb-5 space-y-4">
+                    <p className="text-sm text-foreground/75 leading-relaxed">{product.technicalOverview}</p>
+                    {product.techSpecs && product.techSpecs.length > 0 && (
+                      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                        {product.techSpecs.map((spec) => (
+                          <div key={spec.label} className="flex flex-col">
+                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{spec.label}</span>
+                            <span className="text-sm text-foreground">{spec.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </details>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <button
+                  onClick={async () => {
+                    if (!user) {
+                      toast.error("Please sign in to add items to cart");
+                      navigate("/auth");
+                      return;
+                    }
+                    setAddingToCart(true);
+                    try {
+                      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
+                      await addToCart({
+                        productId: slug || "",
+                        name: product.name,
+                        price: priceNum,
+                        image: currentImage,
+                        variant: selectedVariant,
+                      });
+                      toast.success("Added to cart!");
+                    } catch (err: any) {
+                      toast.error(err.message || "Failed to add to cart");
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  }}
+                  disabled={addingToCart}
+                  className="flex-1 py-4 rounded-full border-2 border-primary text-primary font-semibold text-lg hover:bg-primary/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={20} />
+                  {addingToCart ? "Adding..." : "Add to Cart"}
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  disabled={buyingLoading}
+                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
+                </button>
+              </div>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4 pt-4">
@@ -363,6 +605,44 @@ const ProductPage = () => {
               </div>
             </motion.div>
           </div>
+
+          {/* Mark 1 & Mark 2 Image Gallery */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-24"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-4">Style Meets Intelligence</h2>
+            <p className="text-muted-foreground text-center mb-12 max-w-xl mx-auto">Designed to look effortless, engineered to think ahead.</p>
+
+            {/* Product Gallery — only show current model */}
+            {(() => {
+              const gallery = slug === "mark-1" ? mark1Gallery : mark2Gallery;
+              const label = slug === "mark-1" ? "IMI Mark 1" : "IMI Mark 2";
+              const borderCls = slug === "mark-2" ? "glow-border" : "border border-border";
+              return (
+                <div className="mb-16">
+                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                    <span className="w-8 h-0.5 bg-primary" />
+                    {label}
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {gallery.map((img, idx) => (
+                      <div key={`g-${idx}`} className={`rounded-2xl overflow-hidden ${borderCls} group`}>
+                        <img
+                          src={img}
+                          alt={`${label} - Look ${idx + 1}`}
+                          className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+          </motion.div>
 
           {/* Both Products Section */}
           <motion.div
@@ -377,14 +657,15 @@ const ProductPage = () => {
                 p.variants.map((v) => (
                   <Link
                     key={`${key}-${v.id}`}
-                    to={`/product/${key}`}
+                    to={`/product/${key}?variant=${v.id}`}
+                    onClick={() => { if (key === slug) setSelectedVariant(v.id); }}
                     className={`rounded-2xl border bg-card p-4 hover:border-primary/50 transition-colors group ${
                       slug === key && selectedVariant === v.id ? "border-primary ring-2 ring-primary/20" : "border-border"
                     }`}
                   >
                     <div className="aspect-square rounded-xl overflow-hidden mb-4 bg-muted">
                       <img
-                        src={p.image}
+                        src={v.image}
                         alt={`${p.name} - ${v.label}`}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />

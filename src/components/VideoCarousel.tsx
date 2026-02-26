@@ -1,15 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play } from "lucide-react";
-
-// Cloudinary cloud name
-const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause } from "lucide-react";
 
 const videos = [
-  { src: `${CLD}/imi_ved2_akl631.mp4`, title: "IMI in Action" },
-  { src: `${CLD}/imi_ved3_vnjdl5.mp4`, title: "Smart Features" },
-  { src: `${CLD}/imi_ved4_l3lh7b.mp4`, title: "AI Vision" },
-  { src: `${CLD}/imi_ved3_yzdei3.mp4`, title: "Everyday Style" },
+  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027820/imi_ved3_vnjdl5.mp4", title: "IMI Smart Features" },
+  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027816/imi_ved2_akl631.mp4", title: "IMI in Action" },
+  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027791/imi_ved3_yzdei3.mp4", title: "Everyday Style" },
+  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027803/imi_ved4_l3lh7b.mp4", title: "AI Vision" },
 ];
 
 const VideoCarousel = () => {
@@ -25,7 +22,6 @@ const VideoCarousel = () => {
     []
   );
 
-  // Play active video, pause others
   useEffect(() => {
     videoRefs.current.forEach((v, i) => {
       if (!v) return;
@@ -75,161 +71,134 @@ const VideoCarousel = () => {
     }
   };
 
-  // Helper to get wrapped index
-  const getIdx = (offset: number) =>
-    (activeIndex + offset + videos.length) % videos.length;
-
   return (
-    <section className="py-16 md:py-24 overflow-hidden bg-gradient-to-b from-background via-background to-card/40">
+    <section className="py-16 md:py-24 overflow-hidden bg-background">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            See IMI in Action
+          <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-2 uppercase">
+            User Videos
           </h2>
-          <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Watch how IMI smart glasses transform your everyday experience.
-          </p>
         </motion.div>
       </div>
 
-      {/* Carousel track */}
-      <div className="relative flex items-center justify-center h-[320px] sm:h-[400px] md:h-[480px]">
-        {/* Nav buttons */}
-        <button
-          onClick={() => handleNav(-1)}
-          className="absolute left-2 sm:left-6 z-30 p-2.5 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
-          aria-label="Previous video"
-        >
-          <ChevronLeft size={22} />
-        </button>
-        <button
-          onClick={() => handleNav(1)}
-          className="absolute right-2 sm:right-6 z-30 p-2.5 rounded-full bg-black/60 backdrop-blur-sm text-white hover:bg-black/80 transition-colors shadow-lg"
-          aria-label="Next video"
-        >
-          <ChevronRight size={22} />
-        </button>
+      {/* Side-by-side vertical video cards */}
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="relative flex items-center">
+          {/* Left nav */}
+          <button
+            onClick={() => handleNav(-1)}
+            className="absolute -left-2 sm:left-0 z-30 p-2.5 rounded-full bg-white shadow-lg text-gray-700 hover:bg-gray-100 transition-colors border border-gray-200"
+            aria-label="Previous video"
+          >
+            <ChevronLeft size={20} />
+          </button>
 
-        {/* 5-card spread: -2, -1, 0 (center), +1, +2 */}
-        {[-2, -1, 0, 1, 2].map((offset) => {
-          const idx = getIdx(offset);
-          const isCenter = offset === 0;
-          const absOffset = Math.abs(offset);
+          {/* Right nav */}
+          <button
+            onClick={() => handleNav(1)}
+            className="absolute -right-2 sm:right-0 z-30 p-2.5 rounded-full bg-white shadow-lg text-gray-700 hover:bg-gray-100 transition-colors border border-gray-200"
+            aria-label="Next video"
+          >
+            <ChevronRight size={20} />
+          </button>
 
-          // Positioning & sizing
-          const translateX =
-            offset === 0
-              ? "0%"
-              : offset === -1
-              ? "-115%"
-              : offset === 1
-              ? "115%"
-              : offset === -2
-              ? "-210%"
-              : "210%";
+          {/* Video grid showing 3 at a time — center is active */}
+          <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 px-10 sm:px-14">
+            {[-1, 0, 1].map((offset) => {
+              const idx = (activeIndex + offset + videos.length) % videos.length;
+              const isMain = offset === 0;
 
-          const scale = isCenter ? 1 : absOffset === 1 ? 0.78 : 0.6;
-          const zIndex = isCenter ? 20 : absOffset === 1 ? 10 : 5;
-          const opacity = isCenter ? 1 : absOffset === 1 ? 0.7 : 0.35;
+              return (
+                <motion.div
+                  key={`${idx}-${activeIndex}`}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: Math.abs(offset) * 0.1 }}
+                  className={`relative rounded-2xl overflow-hidden bg-black cursor-pointer shadow-xl ${
+                    offset === 0 ? "" : offset === -1 ? "hidden sm:block" : "hidden lg:block"
+                  }`}
+                  style={{ aspectRatio: "9/16" }}
+                  onClick={() => {
+                    if (!isMain) goTo(idx);
+                  }}
+                >
+                  <video
+                    ref={(el) => setVideoRef(el, idx)}
+                    src={videos[idx].src}
+                    className="w-full h-full object-cover"
+                    muted={isMain ? isMuted : true}
+                    playsInline
+                    autoPlay={isMain}
+                    loop={false}
+                    preload={offset <= 1 ? "auto" : "metadata"}
+                    onEnded={isMain ? handleVideoEnd : undefined}
+                  />
 
-          return (
-            <motion.div
-              key={`${idx}-${offset}`}
-              animate={{
-                x: translateX,
-                scale,
-                opacity,
-                zIndex,
-              }}
-              transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="absolute rounded-2xl overflow-hidden shadow-2xl bg-black cursor-pointer"
-              style={{
-                width: "min(55vw, 460px)",
-                aspectRatio: "16/9",
-                zIndex,
-              }}
-              onClick={() => {
-                if (!isCenter) goTo(idx);
-              }}
-            >
-              <video
-                ref={(el) => setVideoRef(el, idx)}
-                src={videos[idx].src}
-                className="w-full h-full object-cover"
-                muted={isCenter ? isMuted : true}
-                playsInline
-                autoPlay={isCenter}
-                preload={absOffset <= 1 ? "auto" : "metadata"}
-                onEnded={isCenter ? handleVideoEnd : undefined}
-              />
-
-              {/* Dark overlay on side cards */}
-              {!isCenter && (
-                <div className="absolute inset-0 bg-black/40" />
-              )}
-
-              {/* Center card controls */}
-              {isCenter && (
-                <>
-                  {/* Play/Pause overlay */}
-                  {!isPlaying && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        togglePlay();
-                      }}
-                      className="absolute inset-0 flex items-center justify-center z-10"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-                        <Play size={28} className="text-white ml-1" fill="white" />
-                      </div>
-                    </button>
+                  {/* Overlay for non-active */}
+                  {!isMain && (
+                    <div className="absolute inset-0 bg-black/20" />
                   )}
 
-                  {/* Sound toggle - bottom right */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleMute();
-                    }}
-                    className="absolute bottom-3 right-3 z-20 p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-colors"
-                    aria-label={isMuted ? "Unmute" : "Mute"}
-                  >
-                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                  </button>
+                  {/* Controls for active video */}
+                  {isMain && (
+                    <>
+                      {/* Play/Pause top-left */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlay();
+                        }}
+                        className="absolute top-4 left-4 z-20 p-2.5 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
+                      >
+                        {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+                      </button>
 
-                  {/* Title overlay - bottom left */}
-                  <div className="absolute bottom-3 left-3 z-10">
-                    <span className="text-sm font-semibold text-white drop-shadow-lg">
-                      {videos[idx].title}
-                    </span>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          );
-        })}
-      </div>
+                      {/* Mute toggle top-right */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleMute();
+                        }}
+                        className="absolute top-4 right-4 z-20 p-2.5 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-colors"
+                        aria-label={isMuted ? "Unmute" : "Mute"}
+                      >
+                        {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+                      </button>
 
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-2.5 mt-8">
-        {videos.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => goTo(i)}
-            className={`h-2 rounded-full transition-all duration-300 ${
-              i === activeIndex
-                ? "w-8 bg-primary"
-                : "w-2 bg-border hover:bg-muted-foreground"
-            }`}
-            aria-label={`Go to video ${i + 1}`}
-          />
-        ))}
+                      {/* Title bottom-left */}
+                      <div className="absolute bottom-4 left-4 right-4 z-10">
+                        <span className="text-sm font-semibold text-white drop-shadow-lg">
+                          {videos[idx].title}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-2.5 mt-8">
+          {videos.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                i === activeIndex
+                  ? "w-8 bg-primary"
+                  : "w-2 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400"
+              }`}
+              aria-label={`Go to video ${i + 1}`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

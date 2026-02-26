@@ -205,7 +205,7 @@ export const trackEventsBatch = (events: unknown[]) =>
     body: { events },
   }).catch(() => {});
 
-// ─── Cart Tracking ───────────────────────────────────────────
+// ─── Cart Tracking (abandoned - legacy) ─────────────────────
 
 export const updateCart = (data: {
   sessionId: string;
@@ -224,6 +224,65 @@ export const recoverCart = (sessionId: string) =>
     method: "POST",
     body: { sessionId },
   }).catch(() => {});
+
+// ─── User Cart APIs ──────────────────────────────────────────
+
+export interface CartItem {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+  variant: string;
+}
+
+export interface CartResponse {
+  _id?: string;
+  items: CartItem[];
+  totalAmount: number;
+}
+
+export const fetchCart = (token: string): Promise<CartResponse> =>
+  apiRequest<CartResponse>("/cart", { token });
+
+export const addToCartAPI = (
+  item: { productId: string; name: string; price: number; image?: string; variant?: string; quantity?: number },
+  token: string
+): Promise<CartResponse> =>
+  apiRequest<CartResponse>("/cart/add", {
+    method: "POST",
+    body: item,
+    token,
+  });
+
+export const updateCartItemAPI = (
+  productId: string,
+  quantity: number,
+  token: string,
+  variant?: string
+): Promise<CartResponse> =>
+  apiRequest<CartResponse>("/cart/item", {
+    method: "PUT",
+    body: { productId, quantity, variant },
+    token,
+  });
+
+export const removeFromCartAPI = (
+  productId: string,
+  token: string,
+  variant?: string
+): Promise<CartResponse> =>
+  apiRequest<CartResponse>("/cart/remove", {
+    method: "DELETE",
+    body: { productId, variant },
+    token,
+  });
+
+export const clearCartAPI = (token: string): Promise<CartResponse> =>
+  apiRequest<CartResponse>("/cart/clear", {
+    method: "DELETE",
+    token,
+  });
 
 // ─── Tracking Settings ──────────────────────────────────────
 

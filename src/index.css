@@ -154,6 +154,15 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* Marquee animation for promo banner */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+
 /* Hide scrollbar for video carousel */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
