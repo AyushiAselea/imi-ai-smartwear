@@ -2,31 +2,51 @@ import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
-import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck, CreditCard, IndianRupee, Play, X, MessageSquare, CloudSun, Newspaper, MapPin, FileText, Send, StickyNote, HelpCircle, Save, History, User, Video, Image, ScanSearch, Radio, ShoppingCart } from "lucide-react";
+import {
+  Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Shield, Truck,
+  CreditCard, IndianRupee, Play, X, MessageSquare, CloudSun, Newspaper,
+  MapPin, FileText, Send, StickyNote, HelpCircle, Save, History, User,
+  Video, Image, ScanSearch, Radio, ShoppingCart,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import mark1Img from "@/assets/mark1-glasses.jpeg";
-import mark1WhiteImg from "@/assets/mark_1_white.jpeg";
-import mark2Img from "@/assets/mark2-glasses.jpg";
-import mark2WhiteImg from "@/assets/mark2_white.jpeg";
-import mark2BlueImg from "@/assets/mark2_blue.jpeg";
 
-// Gallery images for Mark 1 & Mark 2 showcase
-import gallery1 from "@/assets/WhatsApp Image 2026-02-25 at 7.34.08 PM.jpeg";
-import gallery3 from "@/assets/WhatsApp Image 2026-02-25 at 7.34.53 PM.jpeg";
-import gallery4 from "@/assets/WhatsApp Image 2026-02-25 at 7.35.03 PM.jpeg";
-import mark2Gallery1 from "@/assets/mark_2_1.jpeg";
-import mark2Gallery2 from "@/assets/mark_2_2.jpeg";
-import mark2Gallery3 from "@/assets/mark_2_3.jpeg";
-import mark2Portrait1 from "@/assets/Imi web potr.1.jpg.jpeg";
-import mark2Portrait3 from "@/assets/imi web potr.3.jpg.jpeg";
-import mark2Portrait4 from "@/assets/imi web potr.4.jpg.jpeg";
+/* ──────────────── Mark 1 product images (frame_glass) ──────────────── */
+import m1_black_black from "@/assets/mark_1/mark1_black_black.png";
+import m1_black_white from "@/assets/mark_1/mark1_black_white.png";
+import m1_white_black from "@/assets/mark_1/mark1_white_black.png";
+import m1_white_white from "@/assets/mark_1/mark1_white_white (1).png";
+import m1_back_black from "@/assets/mark_1/mark1_back_black2.png";
+import m1_black_balck1 from "@/assets/mark_1/mark1_black_balck1.png";
+import m1_white_black2 from "@/assets/mark_1/mark1_white_black2.png";
 
-const mark1Gallery = [gallery1, gallery4, gallery3];
-const mark2Gallery = [mark2Gallery1, mark2Gallery2, mark2Gallery3, mark2Portrait1, mark2Portrait3, mark2Portrait4];
-const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
-const mark1Video = `${CLD}/13_nov_imi_reel_2_vacfxr.mp4`;
-const mark2Video = `https://res.cloudinary.com/dvvifezwm/video/upload/v1772089510/30_oct_reel_2_h4vt3k.mp4`;
+/* ──────────────── Mark 2 product images (frame_glass) ──────────────── */
+import m2_black_black from "@/assets/mark2/mark2_black_black.png";
+import m2_black_white from "@/assets/mark2/mark2_black_white.png";
+import m2_white_black from "@/assets/mark2/mark2_white_black.png";
+import m2_white_white from "@/assets/mark2/mark2_white_white1.png";
+import m2_blue_black from "@/assets/mark2/mark2_blue_black.png";
+import m2_blue_white from "@/assets/mark2/mark2_blue_white.png";
+import m2_black_black1 from "@/assets/mark2/mark2_black_black1.png";
+import m2_black_white1 from "@/assets/mark2/mark2_black_white1.png";
+import m2_blue_black1 from "@/assets/mark2/mark2_blue_black1.png";
+import m2_white_black1 from "@/assets/mark2/mark2_white_black1.png";
+
+/* ──────────────── Model / lifestyle shots ──────────────── */
+import m1Model1 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.34.08 PM.jpeg";
+import m1Model2 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.34.53 PM.jpeg";
+import m1Model3 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.03 PM.jpeg";
+import m1Model4 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.22 PM.jpeg";
+import m1Model5 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.36 PM.jpeg";
+import m1Banner from "@/assets/mark2_models/app store deploy.jpg.jpeg";
+
+import m2Model1 from "@/assets/mark2_models/mark_2_1.jpeg";
+import m2Model2 from "@/assets/mark2_models/mark_2_2.jpeg";
+import m2Model3 from "@/assets/mark2_models/mark_2_3.jpeg";
+import m2Model4 from "@/assets/mark2_models/Imi web potr.1.jpg.jpeg";
+import m2Model5 from "@/assets/mark2_models/imi web potr.3.jpg.jpeg";
+import m2Model6 from "@/assets/mark2_models/imi web potr.4.jpg.jpeg";
+
 import { startPayment } from "@/lib/payment";
 import { updateCart, syncSocialUser } from "@/lib/api";
 import type { ShippingAddress } from "@/lib/api";
@@ -35,12 +55,23 @@ import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
 
-interface Variant {
+/* ================================================================== */
+/*  TYPES                                                              */
+/* ================================================================== */
+
+interface GlassOption {
   id: string;
   label: string;
-  color: string;
+}
+
+interface FrameVariant {
+  id: string;
+  label: string;
   colorHex: string;
-  image: string;
+  /** key = glass-option id, value = main product image */
+  images: Record<string, string>;
+  /** extra angle images for thumbnail strip (keyed by glass id) */
+  extraImages: Record<string, string[]>;
 }
 
 interface FeatureCategory {
@@ -54,43 +85,93 @@ interface TechSpec {
   value: string;
 }
 
+interface FeatureCard {
+  icon: any;
+  title: string;
+  description: string;
+  video?: string;
+  image?: string;
+  wide?: boolean;
+}
+
 interface ProductInfo {
   name: string;
   tagline: string;
   description: string;
   price: string;
   originalPrice: string;
-  image: string;
   video: string;
   premium?: boolean;
-  variants: Variant[];
-  features: { icon: any; label: string }[];
-  featureCategories: FeatureCategory[];
+  glassOptions: GlassOption[];
+  frameVariants: FrameVariant[];
+  modelImages: string[];
+  highlights: string[];
   technicalOverview: string;
   techSpecs: TechSpec[];
+  featureCards: FeatureCard[];
+  featureCategories: FeatureCategory[];
 }
+
+/* ================================================================== */
+/*  PRODUCT DATA                                                       */
+/* ================================================================== */
+
+const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
+const mark1Video = `${CLD}/13_nov_imi_reel_2_vacfxr.mp4`;
+const mark2Video = `https://res.cloudinary.com/dvvifezwm/video/upload/v1772089510/30_oct_reel_2_h4vt3k.mp4`;
 
 const productData: Record<string, ProductInfo> = {
   "mark-1": {
     name: "IMI Mark 1",
     tagline: "Smart Everyday AI Glasses",
-    description: "Affordable AI glasses built for everyday smart lifestyle. Voice-activated, AI-powered, and designed for the modern Indian user.",
+    description:
+      "Affordable AI glasses built for everyday smart lifestyle. Voice-activated, AI-powered, and designed for the modern Indian user. Say \"Hey IMI\" and get answers quickly. The game will never be the same with IMI Mark 1.",
     price: "₹2,499",
     originalPrice: "₹5,999",
-    image: mark1Img,
     video: mark1Video,
-    variants: [
-      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111", image: mark1Img },
-      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5", image: mark1WhiteImg },
+    glassOptions: [
+      { id: "black", label: "Black Glass" },
+      { id: "transparent", label: "Transparent" },
     ],
-    features: [
-      { icon: Mic, label: 'Voice Activation ("Hey IMI")' },
-      { icon: Brain, label: "Real-Time AI Chat" },
-      { icon: Phone, label: "Smart Calling" },
-      { icon: Music, label: "Instant Music" },
-      { icon: Database, label: "AI Memory" },
+    frameVariants: [
+      {
+        id: "black",
+        label: "Matte Black",
+        colorHex: "#111",
+        images: {
+          black: m1_black_black,
+          transparent: m1_black_white,
+        },
+        extraImages: {
+          black: [m1_black_balck1, m1_back_black],
+          transparent: [m1_black_balck1, m1_back_black],
+        },
+      },
+      {
+        id: "white",
+        label: "Pearl White",
+        colorHex: "#f5f5f5",
+        images: {
+          black: m1_white_black,
+          transparent: m1_white_white,
+        },
+        extraImages: {
+          black: [m1_white_black2, m1_back_black],
+          transparent: [m1_white_black2, m1_back_black],
+        },
+      },
     ],
-    technicalOverview: "The IMI MARK I Smart Glasses by IMI WEARABLES are advanced Bluetooth-enabled AI smart glasses designed for seamless connectivity and daily convenience. These stylish glasses feature Type-C charging and come equipped with dual 55mAh batteries for long-lasting performance. Built with a durable PVC frame and life waterproof design, they are ideal for everyday use. Powered by the Hyper MZT app, the MARK I Smart Glasses offer App Control functionality, enabling users to manage multiple smart features effortlessly. Key functions include wireless calling, music playback, voice assistant integration, real-time AI translation, weather updates, gaming support, and even a remote camera feature. Perfect for multitaskers and tech enthusiasts, these glasses combine style, innovation, and practicality — delivering a truly smart wearable experience in a sleek, modern design.",
+    modelImages: [m1Model1, m1Model2, m1Model3, m1Model4, m1Model5],
+    highlights: [
+      "Voice activation — just say \"Hey IMI\"",
+      "Real-time AI chat powered by Gemini",
+      "Smart calling & instant music",
+      "Dual 55 mAh batteries + Type-C charging",
+      "PVC frame with life-waterproof design",
+      "AI memory that learns your preferences",
+    ],
+    technicalOverview:
+      "The IMI MARK I Smart Glasses by IMI WEARABLES are advanced Bluetooth-enabled AI smart glasses designed for seamless connectivity and daily convenience. These stylish glasses feature Type-C charging and come equipped with dual 55mAh batteries for long-lasting performance. Built with a durable PVC frame and life waterproof design, they are ideal for everyday use.",
     techSpecs: [
       { label: "Product Type", value: "AI Smart Glasses (App Controlled)" },
       { label: "Battery", value: "55mAh + 55mAh" },
@@ -101,7 +182,31 @@ const productData: Record<string, ProductInfo> = {
       { label: "Connectivity", value: "Bluetooth" },
       { label: "App", value: "Hyper MZT" },
       { label: "Water Resistance", value: "Life Waterproof" },
-      { label: "Key Features", value: "Speaker, AI Assistant, Real-time Translation, Waterproof Design" },
+      { label: "Key Features", value: "Speaker, AI Assistant, Real-time Translation, Waterproof" },
+    ],
+    featureCards: [
+      {
+        icon: Brain,
+        title: "IMI AI",
+        description:
+          'Say "Hey IMI" to get real-time AI answers. Get recommendations, check facts, plan trips, or discover local finds — all hands-free. IMI AI helps you take every aspect of your day to the max.',
+        video: mark1Video,
+        wide: true,
+      },
+      {
+        icon: Music,
+        title: "Immersive audio",
+        description:
+          "Enjoy your favourite music with speakers built right into the frames. Listen to Spotify, Apple Music, and more with just a tap.",
+        image: m1Banner,
+      },
+      {
+        icon: Phone,
+        title: "Hands-free communication",
+        description:
+          "Make calls straight from your glasses. Send and receive texts and voice messages hands-free. You can even share your unique POV thanks to smart connectivity.",
+        image: m1Banner,
+      },
     ],
     featureCategories: [
       {
@@ -135,27 +240,125 @@ const productData: Record<string, ProductInfo> = {
       },
     ],
   },
+
   "mark-2": {
     name: "IMI Mark 2",
     tagline: "Advanced Vision AI Smart Glasses",
-    description: "Next-generation AI glasses with camera and visual intelligence. See smarter, capture life, and talk naturally — all hands-free.",
+    description:
+      "Next-generation AI glasses with camera and visual intelligence. See smarter, capture life, and talk naturally — all hands-free. Equipped with a Sony 818 8MP HD camera for stunning photos and video.",
     price: "₹11,999",
     originalPrice: "₹14,999",
-    image: mark2Img,
     video: mark2Video,
     premium: true,
-    variants: [
-      { id: "black", label: "Matte Black", color: "bg-gray-900", colorHex: "#111", image: mark2Img },
-      { id: "white", label: "Pearl White", color: "bg-white border border-gray-300", colorHex: "#f5f5f5", image: mark2WhiteImg },
-      { id: "blue", label: "Ocean Blue", color: "bg-blue-600", colorHex: "#2563eb", image: mark2BlueImg },
+    glassOptions: [
+      { id: "black", label: "Black Glass" },
+      { id: "transparent", label: "Transparent" },
     ],
-    features: [
-      { icon: Mic, label: "AI Voice Assistant" },
-      { icon: Eye, label: "Real-Time Vision AI" },
-      { icon: Camera, label: "Smart Capture (HD Photo & Video)" },
-      { icon: Brain, label: "Live AI Chat" },
-      { icon: Wifi, label: "Smart Connectivity" },
-      { icon: Database, label: "Personal AI Memory" },
+    frameVariants: [
+      {
+        id: "black",
+        label: "Matte Black",
+        colorHex: "#111",
+        images: {
+          black: m2_black_black,
+          transparent: m2_black_white,
+        },
+        extraImages: {
+          black: [m2_black_black1, m2_black_white1],
+          transparent: [m2_black_white1, m2_black_black1],
+        },
+      },
+      {
+        id: "white",
+        label: "Pearl White",
+        colorHex: "#f5f5f5",
+        images: {
+          black: m2_white_black,
+          transparent: m2_white_white,
+        },
+        extraImages: {
+          black: [m2_white_black1, m2_black_white1],
+          transparent: [m2_white_black1, m2_black_white1],
+        },
+      },
+      {
+        id: "blue",
+        label: "Ocean Blue",
+        colorHex: "#2563eb",
+        images: {
+          black: m2_blue_black,
+          transparent: m2_blue_white,
+        },
+        extraImages: {
+          black: [m2_blue_black1, m2_black_white1],
+          transparent: [m2_blue_black1, m2_black_white1],
+        },
+      },
+    ],
+    modelImages: [m2Model1, m2Model2, m2Model3, m2Model4, m2Model5, m2Model6],
+    highlights: [
+      "Sony 818 8MP HD camera for UHD photos and videos",
+      "Two discreet open-ear Bluetooth speakers + 5-mic array",
+      "32 GB flash storage (1,000+ photos, 100+ 30s videos)",
+      "Up to 1.5 hours battery life, magnetic Type-C charging",
+      "Dual WiFi (5 GHz) + Bluetooth, range up to 210 m",
+      "IP52 water resistance, only 42.5 g",
+    ],
+    technicalOverview:
+      "IMI AI Glasses are next-generation smart eyewear designed for productivity, convenience, and style. Powered by a JL7018F Stereo ENC processor with Allwinner V821 auxiliary chipset, these glasses deliver fast performance with advanced noise reduction. Equipped with a Sony 818 8MP HD camera, IMI Glasses capture high-quality photos and videos with exceptional clarity.",
+    techSpecs: [
+      { label: "Processor", value: "JL7018F Stereo ENC + Allwinner V821" },
+      { label: "Camera", value: "Sony 818 8MP HD" },
+      { label: "Storage", value: "32GB Built-in Memory" },
+      { label: "Battery", value: "270mAh Li-Polymer" },
+      { label: "Playback Time", value: "Up to 1.5 hours" },
+      { label: "Charging", value: "Magnetic Type-C (2hr)" },
+      { label: "Connectivity", value: "Dual WiFi (5GHz) + Bluetooth" },
+      { label: "Range", value: "Up to 210 meters" },
+      { label: "Speakers", value: "150Ω H3.0 with ENC" },
+      { label: "Frame Material", value: "PC + ABS" },
+      { label: "Weight", value: "42.5 grams" },
+      { label: "Water Resistance", value: "IP52" },
+      { label: "App", value: "IMI Glasses (Android & iOS)" },
+      { label: "Languages", value: "25+ Real-time Translation" },
+    ],
+    featureCards: [
+      {
+        icon: Brain,
+        title: "IMI AI",
+        description:
+          'Say "Hey IMI" to get real-time AI answers on anything. With Vision AI, your glasses can see what you see and give you instant context — all hands-free.',
+        video: mark2Video,
+        wide: true,
+      },
+      {
+        icon: Camera,
+        title: "Hands-free capture",
+        description:
+          "Capture the action as it happens with IMI Mark 2's 8MP camera. Take videos or photos from your unique POV. With just a \"Hey IMI\" or a tap, you can always get the shot.",
+        image: m2Model1,
+      },
+      {
+        icon: Music,
+        title: "Immersive audio",
+        description:
+          "The open-ear design lets you enjoy your favourite music with speakers built straight into the frames. Listen to Spotify, Apple Music, and more with just a tap.",
+        image: m2Model2,
+      },
+      {
+        icon: Phone,
+        title: "Hands-free communication",
+        description:
+          "Stay connected like never before. Make calls, send messages, and share your unique POV thanks to the built-in camera. The speakers feature an open-ear design for all-day comfort.",
+        image: m2Model3,
+      },
+      {
+        icon: Eye,
+        title: "Vision AI",
+        description:
+          "Point your glasses at anything and ask. IMI's Vision AI identifies objects, reads text, translates languages, and provides real-time scene understanding.",
+        image: m2Model4,
+      },
     ],
     featureCategories: [
       {
@@ -192,7 +395,7 @@ const productData: Record<string, ProductInfo> = {
         emoji: "📸",
         features: [
           { icon: Camera, label: "Take Photos – Capture images instantly" },
-          { icon: Video, label: "Record Video – Record videos directly from glasses camera" },
+          { icon: Video, label: "Record Video – Record videos from glasses camera" },
           { icon: Image, label: "View Photos & Videos – Access gallery inside the app" },
         ],
       },
@@ -207,23 +410,6 @@ const productData: Record<string, ProductInfo> = {
         ],
       },
     ],
-    technicalOverview: "IMI AI Glasses are next-generation smart eyewear designed for productivity, convenience, and style. Powered by a JL7018F Stereo ENC processor with Allwinner V821 auxiliary chipset, these glasses deliver fast performance with advanced noise reduction capabilities. Equipped with a Sony 818 8MP HD camera, IMI Glasses capture high-quality photos and videos with exceptional clarity, making them ideal for real-time streaming, documentation, and AI-based features. The glasses include 32GB of built-in memory, providing ample space for recordings and app data. Connectivity is seamless with dual WiFi (5GHz) and Bluetooth, offering a strong and stable range of up to 210 meters. Audio performance is enhanced with 150Ω H3.0 speakers and ENC (Environmental Noise Cancellation), ensuring clear music playback and crystal-clear voice calls. Crafted from premium PC and ABS materials, the frame is both lightweight and durable, weighing only 42.5 grams for extended comfort during daily wear.",
-    techSpecs: [
-      { label: "Processor", value: "JL7018F Stereo ENC + Allwinner V821" },
-      { label: "Camera", value: "Sony 818 8MP HD" },
-      { label: "Storage", value: "32GB Built-in Memory" },
-      { label: "Battery", value: "270mAh Li-Polymer" },
-      { label: "Playback Time", value: "Up to 1.5 hours" },
-      { label: "Charging", value: "Magnetic Type-C (2hr)" },
-      { label: "Connectivity", value: "Dual WiFi (5GHz) + Bluetooth" },
-      { label: "Range", value: "Up to 210 meters" },
-      { label: "Speakers", value: "150Ω H3.0 with ENC" },
-      { label: "Frame Material", value: "PC + ABS" },
-      { label: "Weight", value: "42.5 grams" },
-      { label: "Water Resistance", value: "IP52" },
-      { label: "App", value: "IMI Glasses (Android & iOS)" },
-      { label: "Languages", value: "25+ Real-time Translation" },
-    ],
   },
 };
 
@@ -234,15 +420,24 @@ const badges = [
   { icon: IndianRupee, label: "COD Available" },
 ];
 
+/* ================================================================== */
+/*  COMPONENT                                                          */
+/* ================================================================== */
+
 const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const product = slug ? productData[slug] : null;
+
   const variantParam = searchParams.get("variant");
-  const [selectedVariant, setSelectedVariant] = useState(
-    variantParam && product?.variants.some(v => v.id === variantParam) ? variantParam : "black"
+  const [selectedFrame, setSelectedFrame] = useState(
+    variantParam && product?.frameVariants.some((v) => v.id === variantParam)
+      ? variantParam
+      : "black"
   );
+  const [selectedGlass, setSelectedGlass] = useState("black");
+  const [activeThumb, setActiveThumb] = useState(0); // 0 = main, 1/2 = extras
   const [showVideo, setShowVideo] = useState(false);
   const [buyingLoading, setBuyingLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
@@ -250,15 +445,23 @@ const ProductPage = () => {
   const { addToCart } = useCart();
   const { products: backendProducts } = useProducts();
 
-  // Scroll to top and update variant when URL changes
+  // Scroll to top + reset on route change
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (variantParam && product?.variants.some(v => v.id === variantParam)) {
-      setSelectedVariant(variantParam);
+    if (variantParam && product?.frameVariants.some((v) => v.id === variantParam)) {
+      setSelectedFrame(variantParam);
     }
+    setActiveThumb(0);
+    setShowVideo(false);
   }, [slug, variantParam]);
 
-  // ── Checkout modal state ──
+  // Reset thumb when selections change
+  useEffect(() => {
+    setActiveThumb(0);
+    setShowVideo(false);
+  }, [selectedFrame, selectedGlass]);
+
+  /* ── Checkout modal state ── */
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<"address" | "payment">("address");
   const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "COD" | "PARTIAL">("ONLINE");
@@ -273,58 +476,45 @@ const ProductPage = () => {
     country: "India",
   });
 
-  // Derive current image from selected variant
-  const currentImage = product
-    ? (product.variants.find((v) => v.id === selectedVariant)?.image || product.image)
-    : "";
+  /* ── Derived values ── */
+  const frame = product?.frameVariants.find((v) => v.id === selectedFrame) || product?.frameVariants[0];
+  const mainImage = frame?.images[selectedGlass] || "";
+  const extraImages = frame?.extraImages[selectedGlass] || [];
+  const allImages = [mainImage, ...extraImages];
+  const currentImage = allImages[activeThumb] || mainImage;
 
-  // Find matching backend product by name for payment integration
   const getBackendProductId = (): string | null => {
     if (!product || backendProducts.length === 0) return null;
     const match = backendProducts.find(
-      (bp) => bp.name.toLowerCase().includes(product.name.toLowerCase().replace("imi ", ""))
-        || bp.name.toLowerCase() === product.name.toLowerCase()
+      (bp: any) =>
+        bp.name.toLowerCase().includes(product.name.toLowerCase().replace("imi ", "")) ||
+        bp.name.toLowerCase() === product.name.toLowerCase()
     );
     return match ? match._id : null;
   };
 
-  // Track abandoned cart when user views a product
+  // Abandoned cart tracking
   useEffect(() => {
     if (product) {
-      const sessionId = sessionStorage.getItem("imi_session_id") || `s_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
-      if (!sessionStorage.getItem("imi_session_id")) {
-        sessionStorage.setItem("imi_session_id", sessionId);
-      }
+      const sessionId =
+        sessionStorage.getItem("imi_session_id") ||
+        `s_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      if (!sessionStorage.getItem("imi_session_id")) sessionStorage.setItem("imi_session_id", sessionId);
       const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
       updateCart({
         sessionId,
         userId: user?.id,
         email: user?.email || "",
-        products: [
-          {
-            productId: slug || "",
-            name: product.name,
-            price: priceNum,
-            quantity: 1,
-            image: currentImage,
-          },
-        ],
+        products: [{ productId: slug || "", name: product.name, price: priceNum, quantity: 1, image: currentImage }],
         totalAmount: priceNum,
       });
     }
   }, [slug, product, user]);
 
+  /* ── Buy / Cart handlers ── */
   const handleBuyNow = async () => {
-    if (!user) {
-      toast.info("Please sign in to continue with purchase");
-      navigate("/auth");
-      return;
-    }
-
+    if (!user) { toast.info("Please sign in to continue with purchase"); navigate("/auth"); return; }
     let token = localStorage.getItem("imi_token") || "";
-
-    // Token missing but user is logged in (backend was cold-starting during login)
-    // Re-sync silently before blocking the user.
     if (!token && user.email) {
       try {
         toast.loading("Connecting to payment server...", { id: "sync-toast" });
@@ -338,14 +528,7 @@ const ProductPage = () => {
         return;
       }
     }
-
-    if (!token) {
-      toast.info("Please sign in again to continue");
-      navigate("/auth");
-      return;
-    }
-
-    // Open checkout modal
+    if (!token) { toast.info("Please sign in again to continue"); navigate("/auth"); return; }
     setShowCheckout(true);
     setCheckoutStep("address");
   };
@@ -360,41 +543,25 @@ const ProductPage = () => {
     return true;
   };
 
-  const handleProceedToPayment = () => {
-    if (!validateAddress()) return;
-    setCheckoutStep("payment");
-  };
+  const handleProceedToPayment = () => { if (!validateAddress()) return; setCheckoutStep("payment"); };
 
   const handleConfirmOrder = async () => {
     setBuyingLoading(true);
     try {
       const token = localStorage.getItem("imi_token") || "";
       if (!token) { toast.error("Session expired. Please sign in again."); navigate("/auth"); return; }
-
       const sessionId = sessionStorage.getItem("imi_session_id") || "";
       const backendProductId = getBackendProductId();
       const priceNum = parseInt(product!.price.replace(/[₹,]/g, ""));
-      const payload = backendProductId
-        ? { productId: backendProductId }
-        : { productName: product!.name, price: priceNum };
-
+      const payload = backendProductId ? { productId: backendProductId } : { productName: product!.name, price: priceNum };
       const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
-
-      if (result.type === "cod") {
-        toast.success("Order placed successfully! Pay on delivery.");
-        setShowCheckout(false);
-        navigate("/payment/success?method=cod");
-      }
-      // For ONLINE/PARTIAL, startPayment redirects to PayU — code below won't execute
-    } catch (err: any) {
-      toast.error(err.message || "Payment failed. Please try again.");
-    } finally {
-      setBuyingLoading(false);
-    }
+      if (result.type === "cod") { toast.success("Order placed successfully! Pay on delivery."); setShowCheckout(false); navigate("/payment/success?method=cod"); }
+    } catch (err: any) { toast.error(err.message || "Payment failed. Please try again."); } finally { setBuyingLoading(false); }
   };
 
   const priceNum = product ? parseInt(product.price.replace(/[₹,]/g, "")) : 0;
 
+  /* ── 404 ── */
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -406,6 +573,9 @@ const ProductPage = () => {
     );
   }
 
+  /* ================================================================ */
+  /*  RENDER                                                           */
+  /* ================================================================ */
   return (
     <>
       <Helmet>
@@ -413,48 +583,57 @@ const ProductPage = () => {
         <meta name="description" content={product.description} />
       </Helmet>
       <Navbar />
-      <main className="pt-32 pb-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-start">
-            {/* Product Image / Video */}
+
+      <main className="pt-28 pb-16 bg-background">
+        {/* ═══════════════ HERO: IMAGE + DETAILS ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-10 items-start">
+            {/* ── Left: Product image + thumbnails ── */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="md:sticky md:top-36 space-y-4"
+              className="md:sticky md:top-32"
             >
-              <div className={`rounded-2xl overflow-hidden ${product.premium ? "glow-border" : "border border-border"}`}>
+              {/* Main image */}
+              <div className={`rounded-2xl overflow-hidden bg-white ${product.premium ? "glow-border" : "border border-border"}`}>
                 {showVideo ? (
-                  <video
-                    src={product.video}
-                    className="w-full aspect-square object-cover"
-                    controls
-                    autoPlay
-                    playsInline
-                  />
+                  <video src={product.video} className="w-full aspect-square object-cover" controls autoPlay playsInline />
                 ) : (
-                  <img
-                    src={currentImage}
-                    alt={`${product.name} - ${product.tagline}`}
-                    className="w-full aspect-square object-cover"
-                  />
+                  <img src={currentImage} alt={product.name} className="w-full aspect-square object-contain p-4" />
                 )}
               </div>
-              {/* Toggle Image / Video */}
-              <button
-                onClick={() => setShowVideo(!showVideo)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border bg-card hover:bg-secondary transition-colors text-sm font-medium text-foreground"
-              >
-                <Play size={16} className="text-primary" />
-                {showVideo ? "View Photo" : "Watch Product Video"}
-              </button>
+
+              {/* Thumbnail strip */}
+              <div className="flex gap-3 mt-4 overflow-x-auto pb-1">
+                {allImages.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setActiveThumb(i); setShowVideo(false); }}
+                    className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all bg-white ${
+                      !showVideo && activeThumb === i ? "border-primary ring-2 ring-primary/30" : "border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-contain p-1" />
+                  </button>
+                ))}
+                {/* Video thumb */}
+                <button
+                  onClick={() => setShowVideo(true)}
+                  className={`shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 transition-all bg-black flex items-center justify-center ${
+                    showVideo ? "border-primary ring-2 ring-primary/30" : "border-border hover:border-foreground/30"
+                  }`}
+                >
+                  <Play size={20} className="text-white" />
+                </button>
+              </div>
             </motion.div>
 
-            {/* Product Details */}
+            {/* ── Right: Product details ── */}
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
               className="space-y-6"
             >
               {product.premium && (
@@ -462,24 +641,71 @@ const ProductPage = () => {
                   Premium
                 </span>
               )}
+
               <div>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight glow-text">{product.name}</h1>
-                <p className="text-primary font-medium mt-2">{product.tagline}</p>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{product.name}</h1>
+                <p className="text-primary font-medium mt-1">{product.tagline}</p>
               </div>
-              <p className="text-muted-foreground text-lg">{product.description}</p>
+
+              {/* Glass type selector (image thumbnails) */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Glass Type</h3>
+                <div className="flex gap-3">
+                  {product.glassOptions.map((g) => {
+                    const thumb = frame?.images[g.id] || "";
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => setSelectedGlass(g.id)}
+                        className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border-2 transition-all ${
+                          selectedGlass === g.id
+                            ? "border-primary ring-2 ring-primary/30"
+                            : "border-border hover:border-foreground/30"
+                        }`}
+                      >
+                        <div className="w-16 h-16 rounded-lg overflow-hidden bg-white">
+                          <img src={thumb} alt={g.label} className="w-full h-full object-contain p-1" />
+                        </div>
+                        <span className="text-xs font-medium text-foreground">{g.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Frame colour */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Frame colour:</h3>
+                  <span className="text-sm font-semibold text-foreground">{frame?.label}</span>
+                </div>
+                <div className="flex gap-3">
+                  {product.frameVariants.map((v) => (
+                    <button
+                      key={v.id}
+                      onClick={() => setSelectedFrame(v.id)}
+                      className={`w-9 h-9 rounded-full border-2 transition-all ${
+                        selectedFrame === v.id ? "border-primary ring-2 ring-primary/30 scale-110" : "border-border hover:scale-105"
+                      }`}
+                      style={{ backgroundColor: v.colorHex }}
+                      title={v.label}
+                    />
+                  ))}
+                </div>
+              </div>
 
               {/* Powered by Gemini */}
               <div className="flex items-center gap-2.5 py-1">
                 <span className="text-xs text-muted-foreground font-medium tracking-wide">AI powered by</span>
                 <span className="flex items-center gap-1.5">
-                  <svg width="18" height="18" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 1C14 1 16 11.5 22.5 14C16 16.5 14 27 14 27C14 27 12 16.5 5.5 14C12 11.5 14 1 14 1Z" fill="url(#g1)"/>
+                  <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
+                    <path d="M14 1C14 1 16 11.5 22.5 14C16 16.5 14 27 14 27C14 27 12 16.5 5.5 14C12 11.5 14 1 14 1Z" fill="url(#g1)" />
                     <defs>
                       <linearGradient id="g1" x1="5.5" y1="27" x2="22.5" y2="1" gradientUnits="userSpaceOnUse">
-                        <stop offset="0%" stopColor="#1AA260"/>
-                        <stop offset="33%" stopColor="#4285F4"/>
-                        <stop offset="66%" stopColor="#EA4335"/>
-                        <stop offset="100%" stopColor="#FBBC04"/>
+                        <stop offset="0%" stopColor="#1AA260" />
+                        <stop offset="33%" stopColor="#4285F4" />
+                        <stop offset="66%" stopColor="#EA4335" />
+                        <stop offset="100%" stopColor="#FBBC04" />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -487,35 +713,16 @@ const ProductPage = () => {
                 </span>
               </div>
 
-              {/* Color Variants */}
-              <div className="space-y-3 pt-2">
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Color</h3>
-                <div className="flex gap-3">
-                  {product.variants.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVariant(v.id)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-sm font-medium transition-all ${
-                        selectedVariant === v.id
-                          ? "border-primary ring-2 ring-primary/30 text-foreground"
-                          : "border-border text-muted-foreground hover:border-foreground/30"
-                      }`}
-                    >
-                      <span className={`w-4 h-4 rounded-full ${v.color}`} />
-                      {v.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Price */}
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-foreground">{product.price}</span>
                 <span className="text-lg text-muted-foreground line-through">{product.originalPrice}</span>
-                <span className="text-sm font-semibold text-primary">Save {Math.round((1 - parseInt(product.price.replace(/[₹,]/g, '')) / parseInt(product.originalPrice.replace(/[₹,]/g, ''))) * 100)}%</span>
+                <span className="text-sm font-semibold text-primary">
+                  Save {Math.round((1 - parseInt(product.price.replace(/[₹,]/g, "")) / parseInt(product.originalPrice.replace(/[₹,]/g, ""))) * 100)}%
+                </span>
               </div>
 
-              {/* Buy Now + Add to Cart — right after price */}
+              {/* Buy / Cart buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={handleBuyNow}
@@ -526,27 +733,13 @@ const ProductPage = () => {
                 </button>
                 <button
                   onClick={async () => {
-                    if (!user) {
-                      toast.error("Please sign in to add items to cart");
-                      navigate("/auth");
-                      return;
-                    }
+                    if (!user) { toast.error("Please sign in to add items to cart"); navigate("/auth"); return; }
                     setAddingToCart(true);
                     try {
                       const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
-                      await addToCart({
-                        productId: slug || "",
-                        name: product.name,
-                        price: priceNum,
-                        image: currentImage,
-                        variant: selectedVariant,
-                      });
+                      await addToCart({ productId: slug || "", name: product.name, price: priceNum, image: currentImage, variant: selectedFrame });
                       toast.success("Added to cart!");
-                    } catch (err: any) {
-                      toast.error(err.message || "Failed to add to cart");
-                    } finally {
-                      setAddingToCart(false);
-                    }
+                    } catch (err: any) { toast.error(err.message || "Failed to add to cart"); } finally { setAddingToCart(false); }
                   }}
                   disabled={addingToCart}
                   className="flex-1 py-4 rounded-full border-2 border-primary text-primary font-semibold text-lg hover:bg-primary/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
@@ -556,73 +749,11 @@ const ProductPage = () => {
                 </button>
               </div>
               {slug === "mark-1" && (
-                <p className="text-center text-xs font-semibold text-primary/80 tracking-wide">
-                  🔥 Limited offer — only for the first 100 users!
-                </p>
+                <p className="text-center text-xs font-semibold text-primary/80 tracking-wide">🔥 Limited offer — only for the first 100 users!</p>
               )}
 
-              {/* Features */}
-              <div className="space-y-3 pt-4 border-t border-border">
-                <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Key Features</h3>
-                {product.features.map((f: any) => (
-                  <div key={f.label} className="flex items-center gap-3 text-sm">
-                    <f.icon size={18} className="text-primary shrink-0" />
-                    <span className="text-foreground/80">{f.label}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Detailed Feature Categories */}
-              {product.featureCategories && (
-                <div className="space-y-6 pt-4 border-t border-border">
-                  <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">All Features</h3>
-                  {product.featureCategories.map((cat: any) => (
-                    <details key={cat.title} className="group rounded-xl border border-border bg-card/50 overflow-hidden">
-                      <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-secondary/50 transition-colors">
-                        <span className="text-lg">{cat.emoji}</span>
-                        <span className="font-semibold text-sm text-foreground flex-1">{cat.title}</span>
-                        <span className="text-xs text-muted-foreground group-open:hidden">{cat.features.length} features</span>
-                        <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                      </summary>
-                      <div className="px-5 pb-4 space-y-2.5">
-                        {cat.features.map((f: any) => (
-                          <div key={f.label} className="flex items-start gap-3 text-sm">
-                            <f.icon size={16} className="text-primary shrink-0 mt-0.5" />
-                            <span className="text-foreground/80">{f.label}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </details>
-                  ))}
-                </div>
-              )}
-
-              {/* Technical Overview */}
-              {product.technicalOverview && (
-                <details className="group border border-border rounded-2xl overflow-hidden">
-                  <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer select-none hover:bg-muted/50 transition-colors">
-                    <span className="text-lg">📋</span>
-                    <span className="font-semibold text-sm text-foreground flex-1">Technical Overview</span>
-                    <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                  </summary>
-                  <div className="px-5 pb-5 space-y-4">
-                    <p className="text-sm text-foreground/75 leading-relaxed">{product.technicalOverview}</p>
-                    {product.techSpecs && product.techSpecs.length > 0 && (
-                      <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                        {product.techSpecs.map((spec) => (
-                          <div key={spec.label} className="flex flex-col">
-                            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{spec.label}</span>
-                            <span className="text-sm text-foreground">{spec.value}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </details>
-              )}
-
-              {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-4 pt-4">
+              {/* Trust badges */}
+              <div className="grid grid-cols-2 gap-4 pt-2">
                 {badges.map((b) => (
                   <div key={b.label} className="flex items-center gap-2 text-sm text-muted-foreground">
                     <b.icon size={16} className="text-primary" />
@@ -632,74 +763,156 @@ const ProductPage = () => {
               </div>
             </motion.div>
           </div>
+        </section>
 
-          {/* Mark 1 & Mark 2 Image Gallery */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-24"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-4">Style Meets Intelligence</h2>
-            <p className="text-muted-foreground text-center mb-12 max-w-xl mx-auto">Designed to look effortless, engineered to think ahead.</p>
+        {/* ═══════════════ ABOUT SECTION (full-width below hero) ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6 mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-2xl md:text-3xl font-bold mb-8">About {product.name}</h2>
+            <div className="grid md:grid-cols-2 gap-10">
+              {/* Left: description */}
+              <p className="text-muted-foreground leading-relaxed text-base">{product.description}</p>
+              {/* Right: bullet highlights */}
+              <ul className="space-y-3">
+                {product.highlights.map((h, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-foreground/85">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </motion.div>
+        </section>
 
-            {/* Product Gallery — only show current model */}
-            {(() => {
-              const gallery = slug === "mark-1" ? mark1Gallery : mark2Gallery;
-              const label = slug === "mark-1" ? "IMI Mark 1" : "IMI Mark 2";
-              const borderCls = slug === "mark-2" ? "glow-border" : "border border-border";
-              return (
-                <div className="mb-16">
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-                    <span className="w-8 h-0.5 bg-primary" />
-                    {label}
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {gallery.map((img, idx) => (
-                      <div key={`g-${idx}`} className={`rounded-2xl overflow-hidden ${borderCls} group`}>
-                        <img
-                          src={img}
-                          alt={`${label} - Look ${idx + 1}`}
-                          className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
+        {/* ═══════════════ FEATURES SECTION ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6 mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="flex items-center justify-between mb-10">
+              <h2 className="text-2xl md:text-3xl font-bold">Features</h2>
+              <div className="h-px flex-1 ml-6 bg-border" />
+            </div>
+
+            {/* Feature cards */}
+            <div className="space-y-6">
+              {product.featureCards.map((card, i) => (
+                <motion.div
+                  key={card.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ delay: i * 0.08 }}
+                  className={`grid ${card.wide ? "md:grid-cols-[1fr_1.2fr]" : "md:grid-cols-2"} gap-6 items-center ${
+                    i > 0 && !card.wide ? "" : ""
+                  }`}
+                >
+                  {/* Text */}
+                  <div className={`space-y-3 ${i % 2 !== 0 && !card.wide ? "md:order-2" : ""}`}>
+                    <div className="flex items-center gap-2">
+                      <card.icon size={20} className="text-primary" />
+                      <h3 className="text-lg font-bold">{card.title}</h3>
+                    </div>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{card.description}</p>
+                  </div>
+                  {/* Media */}
+                  <div className={`rounded-2xl overflow-hidden bg-muted ${i % 2 !== 0 && !card.wide ? "md:order-1" : ""}`}>
+                    {card.video ? (
+                      <div className="relative group cursor-pointer aspect-video">
+                        <video src={card.video} className="w-full h-full object-cover" muted playsInline loop preload="metadata"
+                          onMouseEnter={(e) => (e.target as HTMLVideoElement).play()}
+                          onMouseLeave={(e) => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }}
                         />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+                          <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Play size={18} className="text-black ml-0.5" />
+                          </div>
+                        </div>
+                      </div>
+                    ) : card.image ? (
+                      <img src={card.image} alt={card.title} className="w-full aspect-video object-cover" loading="lazy" />
+                    ) : null}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Detailed collapsible feature categories */}
+            <div className="space-y-4 mt-12">
+              <h3 className="text-lg font-bold mb-4">All Features</h3>
+              {product.featureCategories.map((cat) => (
+                <details key={cat.title} className="group rounded-xl border border-border bg-card/50 overflow-hidden">
+                  <summary className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-secondary/50 transition-colors">
+                    <span className="text-lg">{cat.emoji}</span>
+                    <span className="font-semibold text-sm text-foreground flex-1">{cat.title}</span>
+                    <span className="text-xs text-muted-foreground group-open:hidden">{cat.features.length} features</span>
+                    <svg className="w-4 h-4 text-muted-foreground transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </summary>
+                  <div className="px-5 pb-4 space-y-2.5">
+                    {cat.features.map((f: any) => (
+                      <div key={f.label} className="flex items-start gap-3 text-sm">
+                        <f.icon size={16} className="text-primary shrink-0 mt-0.5" />
+                        <span className="text-foreground/80">{f.label}</span>
                       </div>
                     ))}
                   </div>
-                </div>
-              );
-            })()}
+                </details>
+              ))}
+            </div>
           </motion.div>
+        </section>
 
-          {/* Both Products Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-24"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-center mb-12">Explore All Models</h2>
+        {/* ═══════════════ TECH SPECS ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6 mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Technical Specifications</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-8 max-w-3xl">{product.technicalOverview}</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-5">
+              {product.techSpecs.map((spec) => (
+                <div key={spec.label} className="flex flex-col">
+                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{spec.label}</span>
+                  <span className="text-sm text-foreground font-medium">{spec.value}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ═══════════════ MODEL / LIFESTYLE GALLERY ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6 mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-center">Style Meets Intelligence</h2>
+            <p className="text-muted-foreground text-center mb-10 max-w-xl mx-auto">Designed to look effortless, engineered to think ahead.</p>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {product.modelImages.map((img, i) => (
+                <div key={i} className={`rounded-2xl overflow-hidden ${product.premium ? "glow-border" : "border border-border"} group`}>
+                  <img src={img} alt={`${product.name} look ${i + 1}`} className="w-full aspect-[3/4] object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
+        {/* ═══════════════ ALL MODELS ═══════════════ */}
+        <section className="max-w-6xl mx-auto px-6 mt-20">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">Explore All Models</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {Object.entries(productData).flatMap(([key, p]) =>
-                p.variants.map((v) => (
+                p.frameVariants.map((v) => (
                   <Link
                     key={`${key}-${v.id}`}
                     to={`/product/${key}?variant=${v.id}`}
-                    onClick={() => { if (key === slug) setSelectedVariant(v.id); }}
+                    onClick={() => { if (key === slug) setSelectedFrame(v.id); }}
                     className={`rounded-2xl border bg-card p-4 hover:border-primary/50 transition-colors group ${
-                      slug === key && selectedVariant === v.id ? "border-primary ring-2 ring-primary/20" : "border-border"
+                      slug === key && selectedFrame === v.id ? "border-primary ring-2 ring-primary/20" : "border-border"
                     }`}
                   >
-                    <div className="aspect-square rounded-xl overflow-hidden mb-4 bg-muted">
-                      <img
-                        src={v.image}
-                        alt={`${p.name} - ${v.label}`}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                    <div className="aspect-square rounded-xl overflow-hidden mb-4 bg-white">
+                      <img src={v.images.black} alt={`${p.name} - ${v.label}`} className="w-full h-full object-contain p-2 group-hover:scale-105 transition-transform duration-300" />
                     </div>
                     <h3 className="font-bold text-base">{p.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className={`w-3 h-3 rounded-full ${v.color}`} />
+                      <span className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: v.colorHex }} />
                       <span className="text-sm text-muted-foreground">{v.label}</span>
                     </div>
                     <p className="text-primary font-semibold mt-2">{p.price}</p>
@@ -708,177 +921,64 @@ const ProductPage = () => {
               )}
             </div>
           </motion.div>
-        </div>
+        </section>
       </main>
+
       <Footer />
 
-      {/* ── Checkout Modal ── */}
+      {/* ═══════════════ CHECKOUT MODAL ═══════════════ */}
       {showCheckout && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-foreground">
-                {checkoutStep === "address" ? "Shipping Address" : "Payment Method"}
-              </h2>
-              <button
-                onClick={() => setShowCheckout(false)}
-                className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <X size={20} />
-              </button>
+              <h2 className="text-lg font-bold text-foreground">{checkoutStep === "address" ? "Shipping Address" : "Payment Method"}</h2>
+              <button onClick={() => setShowCheckout(false)} className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
             </div>
 
             {checkoutStep === "address" && (
               <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Full Name *"
-                  value={address.fullName}
-                  onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone Number *"
-                  value={address.phone}
-                  onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Address Line 1 *"
-                  value={address.addressLine1}
-                  onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                />
-                <input
-                  type="text"
-                  placeholder="Address Line 2 (Optional)"
-                  value={address.addressLine2}
-                  onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                />
+                <input type="text" placeholder="Full Name *" value={address.fullName} onChange={(e) => setAddress({ ...address, fullName: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
+                <input type="tel" placeholder="Phone Number *" value={address.phone} onChange={(e) => setAddress({ ...address, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
+                <input type="text" placeholder="Address Line 1 *" value={address.addressLine1} onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
+                <input type="text" placeholder="Address Line 2 (Optional)" value={address.addressLine2} onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
                 <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    placeholder="City *"
-                    value={address.city}
-                    onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="State *"
-                    value={address.state}
-                    onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                  />
+                  <input type="text" placeholder="City *" value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
+                  <input type="text" placeholder="State *" value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    placeholder="PIN Code *"
-                    value={address.postalCode}
-                    onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Country"
-                    value={address.country}
-                    onChange={(e) => setAddress({ ...address, country: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm"
-                  />
+                  <input type="text" placeholder="PIN Code *" value={address.postalCode} onChange={(e) => setAddress({ ...address, postalCode: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
+                  <input type="text" placeholder="Country" value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
                 </div>
-                <button
-                  onClick={handleProceedToPayment}
-                  className="w-full py-3 mt-2 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
-                >
-                  Continue to Payment
-                </button>
+                <button onClick={handleProceedToPayment} className="w-full py-3 mt-2 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">Continue to Payment</button>
               </div>
             )}
 
             {checkoutStep === "payment" && (
               <div className="space-y-4">
-                {/* Order summary */}
                 <div className="rounded-xl bg-background border border-border p-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Product</span>
-                    <span className="text-foreground font-medium">{product?.name}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Total</span>
-                    <span className="text-foreground font-bold">₹{priceNum.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Ship to</span>
-                    <span className="text-foreground text-right text-xs max-w-[60%]">{address.addressLine1}, {address.city}</span>
-                  </div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Product</span><span className="text-foreground font-medium">{product?.name}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total</span><span className="text-foreground font-bold">₹{priceNum.toLocaleString()}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Ship to</span><span className="text-foreground text-right text-xs max-w-[60%]">{address.addressLine1}, {address.city}</span></div>
                 </div>
 
-                {/* Payment options */}
                 <div className="space-y-2">
                   <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Choose Payment</p>
-
-                  <label
-                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                      paymentMethod === "ONLINE" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
-                    }`}
-                  >
-                    <input type="radio" name="pm" checked={paymentMethod === "ONLINE"} onChange={() => setPaymentMethod("ONLINE")} className="accent-primary" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Pay Full Amount Online</p>
-                      <p className="text-xs text-muted-foreground">₹{priceNum.toLocaleString()} via PayU (UPI / Card / Net Banking)</p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                      paymentMethod === "COD" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
-                    }`}
-                  >
-                    <input type="radio" name="pm" checked={paymentMethod === "COD"} onChange={() => setPaymentMethod("COD")} className="accent-primary" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Cash on Delivery</p>
-                      <p className="text-xs text-muted-foreground">Pay ₹{priceNum.toLocaleString()} when delivered</p>
-                    </div>
-                  </label>
-
-                  <label
-                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                      paymentMethod === "PARTIAL" ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
-                    }`}
-                  >
-                    <input type="radio" name="pm" checked={paymentMethod === "PARTIAL"} onChange={() => setPaymentMethod("PARTIAL")} className="accent-primary" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-foreground">Pay 50% Now</p>
-                      <p className="text-xs text-muted-foreground">
-                        Pay ₹{Math.round(priceNum * 0.5).toLocaleString()} now · ₹{Math.round(priceNum * 0.5).toLocaleString()} on delivery
-                      </p>
-                    </div>
-                  </label>
+                  {([
+                    { id: "ONLINE" as const, title: "Pay Full Amount Online", desc: `₹${priceNum.toLocaleString()} via PayU (UPI / Card / Net Banking)` },
+                    { id: "COD" as const, title: "Cash on Delivery", desc: `Pay ₹${priceNum.toLocaleString()} when delivered` },
+                    { id: "PARTIAL" as const, title: "Pay 50% Now", desc: `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} now · ₹${Math.round(priceNum * 0.5).toLocaleString()} on delivery` },
+                  ]).map((opt) => (
+                    <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${paymentMethod === opt.id ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"}`}>
+                      <input type="radio" name="pm" checked={paymentMethod === opt.id} onChange={() => setPaymentMethod(opt.id)} className="accent-primary" />
+                      <div className="flex-1"><p className="text-sm font-medium text-foreground">{opt.title}</p><p className="text-xs text-muted-foreground">{opt.desc}</p></div>
+                    </label>
+                  ))}
                 </div>
 
                 <div className="flex gap-3 pt-2">
-                  <button
-                    onClick={() => setCheckoutStep("address")}
-                    className="flex-1 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors"
-                  >
-                    Back
-                  </button>
-                  <button
-                    onClick={handleConfirmOrder}
-                    disabled={buyingLoading}
-                    className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
-                  >
-                    {buyingLoading
-                      ? "Processing..."
-                      : paymentMethod === "COD"
-                      ? "Place Order"
-                      : paymentMethod === "PARTIAL"
-                      ? `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} Now`
-                      : `Pay ₹${priceNum.toLocaleString()}`}
+                  <button onClick={() => setCheckoutStep("address")} className="flex-1 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors">Back</button>
+                  <button onClick={handleConfirmOrder} disabled={buyingLoading} className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
+                    {buyingLoading ? "Processing..." : paymentMethod === "COD" ? "Place Order" : paymentMethod === "PARTIAL" ? `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} Now` : `Pay ₹${priceNum.toLocaleString()}`}
                   </button>
                 </div>
               </div>

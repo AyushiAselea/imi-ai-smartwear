@@ -4,7 +4,7 @@ import logoWhite from "@/assets/new Final IMI LOGO.png";
 import logoBlack from "@/assets/WhatsApp Image 2025-09-08 at 6.23.45 PM.png";
 import img1 from "@/assets/ChatGPT Image Feb 27, 2026, 02_08_45 PM.png";
 import img2 from "@/assets/ChatGPT Image Feb 27, 2026, 02_17_28 PM.png";
-import img3 from "@/assets/ChatGPT Image Feb 27, 2026, 02_45_34 PM.png";
+import img3 from "@/assets/dog.jpeg";
 import img4 from "@/assets/Smart glasses and friendly conversation.png";
 
 const cards = [
@@ -73,7 +73,7 @@ const VersionsSection = () => {
               className="flex flex-col"
             >
               {/* Card image */}
-              <div className="relative rounded-2xl overflow-hidden aspect-[3/4] group cursor-pointer">
+              <div className="relative rounded-2xl overflow-hidden aspect-[2/3] group cursor-pointer">
                 <img
                   src={card.image}
                   alt={card.label}

@@ -1,39 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import post1 from "@/assets/Post 1.png";
-import post2 from "@/assets/Post 2.png";
-import post3 from "@/assets/Post 3.png";
+import { motion } from "framer-motion";
 
-const heroImages = [post1, post2, post3];
+const HERO_VIDEO_URL =
+  "https://res.cloudinary.com/dvvifezwm/video/upload/v1772192316/WhatsApp_Video_2026-02-27_at_4.51.19_PM_e2zf3b.mp4";
 
 const HeroSection = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextSlide = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(nextSlide, 2000);
-    return () => clearInterval(interval);
-  }, [nextSlide]);
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Single image at a time with crossfade */}
+      {/* Background video */}
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="wait">
-          <motion.img
-            key={currentIndex}
-            src={heroImages[currentIndex]}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          />
-        </AnimatePresence>
+        <video
+          src={HERO_VIDEO_URL}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
         {/* Overlay — always dark so text stays white in both modes */}
         <div className="absolute inset-0 bg-black/55" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
@@ -80,20 +62,6 @@ const HeroSection = () => {
             Shop Mark 2
           </a>
         </motion.div>
-
-        {/* Slide indicators */}
-        <div className="flex justify-center gap-2 mt-10">
-          {heroImages.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                i === currentIndex ? "bg-primary w-8" : "bg-white/40 hover:bg-white/60"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
       </div>
     </section>
   );

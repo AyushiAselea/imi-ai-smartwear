@@ -6,11 +6,11 @@ import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Clock } from "lu
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-import mark1Img from "@/assets/mark1-glasses.jpeg";
-import mark1WhiteImg from "@/assets/mark_1_white.jpeg";
-import mark2Img from "@/assets/mark2-glasses.jpg";
-import mark2WhiteImg from "@/assets/mark2_white.jpeg";
-import mark2BlueImg from "@/assets/mark2_blue.jpeg";
+import mark1Img from "@/assets/mark_1/mark1_black_black.png";
+import mark1WhiteImg from "@/assets/mark_1/mark1_white_black.png";
+import mark2Img from "@/assets/mark2/mark2_black_black.png";
+import mark2WhiteImg from "@/assets/mark2/mark2_white_black.png";
+import mark2BlueImg from "@/assets/mark2/mark2_blue_black.png";
 
 interface ProductCard {
   slug: string;

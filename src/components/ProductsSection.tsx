@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Play, CloudSun, Newspaper, MapPin, FileText, Send, StickyNote, HelpCircle, Save, History, User, Video, Image, ScanSearch, Radio, MessageSquare } from "lucide-react";
-import mark1Img from "@/assets/mark1-glasses.jpeg";
-import mark2Img from "@/assets/mark2-glasses.jpg";
+import mark1Img from "@/assets/mark_1/mark1_black_black.png";
+import mark2Img from "@/assets/mark2/mark2_black_black.png";
 
 // Gallery images
 import gallery1 from "@/assets/WhatsApp Image 2026-02-25 at 7.34.08 PM.jpeg";

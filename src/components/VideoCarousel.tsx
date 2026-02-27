@@ -23,11 +23,21 @@ const VideoCarousel = () => {
   );
 
   useEffect(() => {
+    const visible = new Set([
+      (activeIndex - 1 + videos.length) % videos.length,
+      activeIndex,
+      (activeIndex + 1) % videos.length,
+    ]);
+
     videoRefs.current.forEach((v, i) => {
       if (!v) return;
-      if (i === activeIndex) {
-        v.currentTime = 0;
-        v.muted = isMuted;
+      if (visible.has(i)) {
+        if (i === activeIndex) {
+          v.currentTime = 0;
+          v.muted = isMuted;
+        } else {
+          v.muted = true;
+        }
         if (isPlaying) v.play().catch(() => {});
       } else {
         v.pause();
@@ -133,9 +143,9 @@ const VideoCarousel = () => {
                     className="w-full h-full object-cover"
                     muted={isMain ? isMuted : true}
                     playsInline
-                    autoPlay={isMain}
-                    loop={false}
-                    preload={offset <= 1 ? "auto" : "metadata"}
+                    autoPlay
+                    loop={!isMain}
+                    preload="auto"
                     onEnded={isMain ? handleVideoEnd : undefined}
                   />
 
