@@ -11,20 +11,20 @@ const cards = [
   {
     label: "Get recommendations",
     image: img1,
-    quote: '"Hey IMI, what should I wear today?"',
-  },
-  {
-    label: "Translate text",
-    image: img2,
-    quote: '"Translate this sign to English."',
+    quote: '"What\'s the best time to take a sunset photo?"',
   },
   {
     label: "Ask anything",
-    image: img3,
-    quote: '"What are some good exercises to improve my cycling speed?"',
+    image: img2,
+    quote: '"What are some good exercises to improve my biking speed?"',
   },
   {
-    label: "Stay connected",
+    label: "Click and ask",
+    image: img3,
+    quote: '"Click photo of dog and tell me its breed."',
+  },
+  {
+    label: "Meeting minutes",
     image: img4,
     quote: '"Remember my meeting at 5 PM."',
   },
