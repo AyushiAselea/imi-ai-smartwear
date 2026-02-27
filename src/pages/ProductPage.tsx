@@ -418,7 +418,7 @@ const ProductPage = () => {
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
-              className="sticky top-36 space-y-4"
+              className="md:sticky md:top-36 space-y-4"
             >
               <div className={`rounded-2xl overflow-hidden ${product.premium ? "glow-border" : "border border-border"}`}>
                 {showVideo ? (
