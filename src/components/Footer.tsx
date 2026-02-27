@@ -30,16 +30,13 @@ const Footer = () => {
               IMI Wearables is India's leading AI smart glasses brand. We combine cutting-edge artificial intelligence with stylish eyewear to make everyday life smarter, hands-free, and future-ready.
             </p>
             <div className="flex gap-3">
-              <a href="https://www.instagram.com/imi.wearables/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
+              <a href="https://www.instagram.com/imiglasses?igsh=YTc1amN6cTY3MHdl" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
                 <Instagram size={16} />
               </a>
-              <a href="https://x.com/ImiWearables" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
-                <Twitter size={16} />
-              </a>
-              <a href="https://www.linkedin.com/company/imi-wearables/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
+              <a href="https://www.linkedin.com/company/imi-glasses/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
                 <Linkedin size={16} />
               </a>
-              <a href="https://www.youtube.com/@IMIWearables" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
+              <a href="https://www.youtube.com/channel/UCUHMLxu_pZpScd1InXmiTGg" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition-colors">
                 <Youtube size={16} />
               </a>
             </div>
@@ -65,15 +62,15 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="text-primary shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-400">IMI Wearables Pvt. Ltd.<br />New Delhi, India</span>
+                <span className="text-sm text-gray-400">IMI Wearables<br />611 horizin tower, oppostise mercidies showroom, malviya nagar, Jaipur, India</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-primary shrink-0" />
-                <a href="mailto:support@imiwearables.com" className="text-sm text-gray-400 hover:text-white transition-colors">support@imiwearables.com</a>
+                <a href="mailto:support@imiwearables.com" className="text-sm text-gray-400 hover:text-white transition-colors">tanay@imiglasses.com</a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={16} className="text-primary shrink-0" />
-                <a href="tel:+919876543210" className="text-sm text-gray-400 hover:text-white transition-colors">+91 98765 43210</a>
+                <a href="tel:+919876543210" className="text-sm text-gray-400 hover:text-white transition-colors">+91 9024194918</a>
               </li>
             </ul>
           </div>

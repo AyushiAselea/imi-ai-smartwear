@@ -6,6 +6,7 @@ import VideoCarousel from "@/components/VideoCarousel";
 
 import FeaturesSection from "@/components/FeaturesSection";
 import ComparisonSection from "@/components/ComparisonSection";
+import VersionsSection from "@/components/VersionsSection";
 import WhyImiSection from "@/components/WhyImiSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import CtaSection from "@/components/CtaSection";
@@ -27,6 +28,7 @@ const Index = () => {
         <HeroSection />
         <VideoCarousel />
         <ProductsSection />
+        <VersionsSection />
         <TestimonialsSection />
         <ComparisonSection />
         <FeaturesSection />
