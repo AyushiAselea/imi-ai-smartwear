@@ -18,9 +18,12 @@ import gallery4 from "@/assets/WhatsApp Image 2026-02-25 at 7.35.03 PM.jpeg";
 import mark2Gallery1 from "@/assets/mark_2_1.jpeg";
 import mark2Gallery2 from "@/assets/mark_2_2.jpeg";
 import mark2Gallery3 from "@/assets/mark_2_3.jpeg";
+import mark2Portrait1 from "@/assets/Imi web potr.1.jpg.jpeg";
+import mark2Portrait3 from "@/assets/imi web potr.3.jpg.jpeg";
+import mark2Portrait4 from "@/assets/imi web potr.4.jpg.jpeg";
 
 const mark1Gallery = [gallery1, gallery4, gallery3];
-const mark2Gallery = [mark2Gallery1, mark2Gallery2, mark2Gallery3];
+const mark2Gallery = [mark2Gallery1, mark2Gallery2, mark2Gallery3, mark2Portrait1, mark2Portrait3, mark2Portrait4];
 const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
 const mark1Video = `${CLD}/13_nov_imi_reel_2_vacfxr.mp4`;
 const mark2Video = `https://res.cloudinary.com/dvvifezwm/video/upload/v1772089510/30_oct_reel_2_h4vt3k.mp4`;
@@ -465,6 +468,25 @@ const ProductPage = () => {
               </div>
               <p className="text-muted-foreground text-lg">{product.description}</p>
 
+              {/* Powered by Gemini */}
+              <div className="flex items-center gap-2.5 py-1">
+                <span className="text-xs text-muted-foreground font-medium tracking-wide">AI powered by</span>
+                <span className="flex items-center gap-1.5">
+                  <svg width="18" height="18" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14 1C14 1 16 11.5 22.5 14C16 16.5 14 27 14 27C14 27 12 16.5 5.5 14C12 11.5 14 1 14 1Z" fill="url(#g1)"/>
+                    <defs>
+                      <linearGradient id="g1" x1="5.5" y1="27" x2="22.5" y2="1" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stopColor="#1AA260"/>
+                        <stop offset="33%" stopColor="#4285F4"/>
+                        <stop offset="66%" stopColor="#EA4335"/>
+                        <stop offset="100%" stopColor="#FBBC04"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <span className="text-sm font-semibold text-foreground">Gemini</span>
+                </span>
+              </div>
+
               {/* Color Variants */}
               <div className="space-y-3 pt-2">
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Color</h3>
@@ -492,6 +514,52 @@ const ProductPage = () => {
                 <span className="text-lg text-muted-foreground line-through">{product.originalPrice}</span>
                 <span className="text-sm font-semibold text-primary">Save {Math.round((1 - parseInt(product.price.replace(/[₹,]/g, '')) / parseInt(product.originalPrice.replace(/[₹,]/g, ''))) * 100)}%</span>
               </div>
+
+              {/* Buy Now + Add to Cart — right after price */}
+              <div className="flex gap-3">
+                <button
+                  onClick={handleBuyNow}
+                  disabled={buyingLoading}
+                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!user) {
+                      toast.error("Please sign in to add items to cart");
+                      navigate("/auth");
+                      return;
+                    }
+                    setAddingToCart(true);
+                    try {
+                      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
+                      await addToCart({
+                        productId: slug || "",
+                        name: product.name,
+                        price: priceNum,
+                        image: currentImage,
+                        variant: selectedVariant,
+                      });
+                      toast.success("Added to cart!");
+                    } catch (err: any) {
+                      toast.error(err.message || "Failed to add to cart");
+                    } finally {
+                      setAddingToCart(false);
+                    }
+                  }}
+                  disabled={addingToCart}
+                  className="flex-1 py-4 rounded-full border-2 border-primary text-primary font-semibold text-lg hover:bg-primary/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  <ShoppingCart size={20} />
+                  {addingToCart ? "Adding..." : "Add to Cart"}
+                </button>
+              </div>
+              {slug === "mark-1" && (
+                <p className="text-center text-xs font-semibold text-primary/80 tracking-wide">
+                  🔥 Limited offer — only for the first 100 users!
+                </p>
+              )}
 
               {/* Features */}
               <div className="space-y-3 pt-4 border-t border-border">
@@ -552,47 +620,6 @@ const ProductPage = () => {
                   </div>
                 </details>
               )}
-
-              {/* Action Buttons */}
-              <div className="flex gap-3">
-                <button
-                  onClick={async () => {
-                    if (!user) {
-                      toast.error("Please sign in to add items to cart");
-                      navigate("/auth");
-                      return;
-                    }
-                    setAddingToCart(true);
-                    try {
-                      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
-                      await addToCart({
-                        productId: slug || "",
-                        name: product.name,
-                        price: priceNum,
-                        image: currentImage,
-                        variant: selectedVariant,
-                      });
-                      toast.success("Added to cart!");
-                    } catch (err: any) {
-                      toast.error(err.message || "Failed to add to cart");
-                    } finally {
-                      setAddingToCart(false);
-                    }
-                  }}
-                  disabled={addingToCart}
-                  className="flex-1 py-4 rounded-full border-2 border-primary text-primary font-semibold text-lg hover:bg-primary/10 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  <ShoppingCart size={20} />
-                  {addingToCart ? "Adding..." : "Add to Cart"}
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  disabled={buyingLoading}
-                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
-                </button>
-              </div>
 
               {/* Trust Badges */}
               <div className="grid grid-cols-2 gap-4 pt-4">
