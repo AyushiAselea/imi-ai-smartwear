@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import mark1Img from "@/assets/mark1-glasses.jpeg";
 import mark1WhiteImg from "@/assets/mark_1_white.jpeg";
-import mark2Img from "@/assets/mark2-glasses.png";
+import mark2Img from "@/assets/mark2-glasses.jpeg";
 import mark2WhiteImg from "@/assets/mark2_white.jpeg";
 import mark2BlueImg from "@/assets/mark2_blue.jpeg";
 
