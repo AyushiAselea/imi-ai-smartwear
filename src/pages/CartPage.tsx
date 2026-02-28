@@ -95,9 +95,13 @@ const CartPage = () => {
           : { productName: item.name, price: item.price };
         const result = await startPayment(payload, item.quantity, token, paymentMethod, address, sessionId);
         if (result.type === "cod") {
+          await clearCart();
           toast.success("Order placed successfully! Pay on delivery.");
           setShowCheckout(false);
           navigate("/payment/success?method=cod");
+        } else {
+          // Online/Partial — redirect to PayU (cart will be cleared on success page)
+          await clearCart();
         }
       } else {
         // Multiple items — aggregate into one payment
@@ -105,9 +109,12 @@ const CartPage = () => {
         const payload = { productName: combinedNames, price: totalAmount };
         const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
         if (result.type === "cod") {
+          await clearCart();
           toast.success("Order placed successfully! Pay on delivery.");
           setShowCheckout(false);
           navigate("/payment/success?method=cod");
+        } else {
+          await clearCart();
         }
       }
     } catch (err: any) {

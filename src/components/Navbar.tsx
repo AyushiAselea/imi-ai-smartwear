@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, User, LogOut, Sun, Moon, ShoppingCart } from "lucide-react";
+import { Menu, X, User, LogOut, Sun, Moon, ShoppingCart, Package } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -109,6 +109,14 @@ const Navbar = () => {
                             <p className="text-xs text-muted-foreground">Signed in as</p>
                             <p className="text-sm font-semibold text-foreground truncate">{user.displayName || user.email}</p>
                           </div>
+                          <Link
+                            to="/profile"
+                            onClick={() => setDropdownOpen(false)}
+                            className="w-full flex items-center gap-2 px-4 py-3 text-sm text-foreground hover:bg-secondary transition-colors"
+                          >
+                            <Package size={14} />
+                            My Orders
+                          </Link>
                           <button
                             onClick={() => { signOut(); setDropdownOpen(false); }}
                             className="w-full flex items-center gap-2 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors"
@@ -197,6 +205,13 @@ const Navbar = () => {
                             exit={{ opacity: 0, y: -6 }}
                             className="absolute left-0 mt-2 w-40 rounded-md bg-card border border-border shadow-md z-40 overflow-hidden"
                           >
+                            <Link
+                              to="/profile"
+                              onClick={() => { setOpen(false); setMobileDropdownOpen(false); }}
+                              className="w-full flex items-center px-4 py-3 text-sm text-foreground hover:bg-secondary"
+                            >
+                              <Package size={14} className="inline mr-2" /> My Orders
+                            </Link>
                             <button
                               onClick={() => { signOut(); setOpen(false); setMobileDropdownOpen(false); }}
                               className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10"

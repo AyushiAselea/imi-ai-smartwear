@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { verifyPayment } from "@/lib/api";
+import { verifyPayment, clearCartAPI } from "@/lib/api";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -14,8 +14,13 @@ const PaymentSuccess = () => {
   const [verified, setVerified] = useState(false);
 
   useEffect(() => {
+    // Clear cart after successful payment
+    const token = localStorage.getItem("imi_token") || "";
+    if (token) {
+      clearCartAPI(token).catch(() => {});
+    }
+
     if (txnid) {
-      const token = localStorage.getItem("imi_token") || "";
       verifyPayment(txnid, token)
         .then(() => setVerified(true))
         .catch(() => setVerified(true)); // Show success regardless — PayU already confirmed
@@ -50,12 +55,20 @@ const PaymentSuccess = () => {
               Transaction ID: {txnid}
             </p>
           )}
-          <Link
-            to="/"
-            className="inline-block px-8 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
-          >
-            Back to Home
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/profile"
+              className="inline-block px-8 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+            >
+              View My Orders
+            </Link>
+            <Link
+              to="/"
+              className="inline-block px-8 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors"
+            >
+              Back to Home
+            </Link>
+          </div>
         </div>
       </main>
       <Footer />

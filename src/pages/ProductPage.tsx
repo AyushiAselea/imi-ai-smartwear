@@ -556,6 +556,8 @@ const ProductPage = () => {
       const payload = backendProductId ? { productId: backendProductId } : { productName: product!.name, price: priceNum };
       const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
       if (result.type === "cod") { toast.success("Order placed successfully! Pay on delivery."); setShowCheckout(false); navigate("/payment/success?method=cod"); }
+      // Clear cart after any successful purchase (COD or redirect)
+      try { const { clearCartAPI } = await import("@/lib/api"); const tk = localStorage.getItem("imi_token"); if (tk) await clearCartAPI(tk); } catch {}
     } catch (err: any) { toast.error(err.message || "Payment failed. Please try again."); } finally { setBuyingLoading(false); }
   };
 
