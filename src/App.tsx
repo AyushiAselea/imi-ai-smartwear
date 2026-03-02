@@ -37,7 +37,7 @@ const App = () => {
           <CartProvider>
             <TooltipProvider>
               <Toaster />
-              <Sonner />
+              <Sonner position="top-center" />
               <BrowserRouter>
                 <RouteTracker />
                 <Routes>
