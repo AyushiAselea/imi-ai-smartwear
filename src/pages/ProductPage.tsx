@@ -16,7 +16,10 @@ import m1_black_black from "@/assets/mark_1/mark1_black_black.png";
 import m1_black_white from "@/assets/mark_1/mark1_black_white.png";
 import m1_white_black from "@/assets/mark_1/mark1_white_black.png";
 import m1_white_white from "@/assets/mark_1/mark1_white_white (1).png";
+import m1_white_white2 from "@/assets/mark_1/mark1_white_white (2).png";
 import m1_back_black from "@/assets/mark_1/mark1_back_black2.png";
+import m1_back_white from "@/assets/mark_1/mark1_back_white(glasses).png";
+import m1_back_white1 from "@/assets/mark_1/mark1_back_white1(glasses).jpeg";
 import m1_black_balck1 from "@/assets/mark_1/mark1_black_balck1.png";
 import m1_white_black2 from "@/assets/mark_1/mark1_white_black2.png";
 
@@ -144,7 +147,7 @@ const productData: Record<string, ProductInfo> = {
         },
         extraImages: {
           black: [m1_black_balck1, m1_back_black],
-          transparent: [m1_black_balck1, m1_back_black],
+          transparent: [m1_back_white1, m1_black_balck1],
         },
       },
       {
@@ -157,7 +160,7 @@ const productData: Record<string, ProductInfo> = {
         },
         extraImages: {
           black: [m1_white_black2, m1_back_black],
-          transparent: [m1_white_black2, m1_back_black],
+          transparent: [m1_white_white2, m1_back_white],
         },
       },
     ],

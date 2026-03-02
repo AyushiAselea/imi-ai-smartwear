@@ -133,7 +133,7 @@ const ProductShowcaseSection = () => {
                 to={p.link}
                 className={`inline-block px-8 py-2.5 rounded-full text-sm font-semibold transition-opacity hover:opacity-90 ${
                   p.premium
-                    ? "bg-primary text-primary-foreground"
+                    ? "bg-foreground text-background"
                     : "bg-foreground text-background"
                 }`}
               >
