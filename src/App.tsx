@@ -15,6 +15,9 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailure from "./pages/PaymentFailure";
 import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import RefundPolicy from "./pages/RefundPolicy";
 import { useEffect } from "react";
 import { initAnalytics } from "@/lib/analytics";
 import { loadTrackingScripts } from "@/lib/tracking";
@@ -49,6 +52,9 @@ const App = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/payment/success" element={<PaymentSuccess />} />
                   <Route path="/payment/failure" element={<PaymentFailure />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

@@ -29,6 +29,24 @@ const RouteTracker = () => {
     }
   }, [location]);
 
+  // Scroll to hash when present (supports SPA navigation to anchors)
+  useEffect(() => {
+    const hash = location.hash;
+    // small delay to allow page content to render
+    if (hash) {
+      const id = hash.replace("#", "");
+      setTimeout(() => {
+        const el = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const absoluteY = rect.top + window.pageYOffset;
+          const OFFSET = 120; // adjust so element is not hidden under fixed header
+          window.scrollTo({ top: Math.max(0, absoluteY - OFFSET), behavior: "smooth" });
+        }
+      }, 60);
+    }
+  }, [location.pathname, location.hash]);
+
   // Meta Pixel — only active on /product/mark-1
   useMetaPixel();
 

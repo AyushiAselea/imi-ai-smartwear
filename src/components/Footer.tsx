@@ -46,13 +46,14 @@ const Footer = () => {
           <div>
             <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-5">Company</h4>
             <ul className="space-y-3">
-              <li><a href="#products" className="text-sm text-gray-400 hover:text-white transition-colors">Products</a></li>
-              <li><a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a></li>
-              <li><a href="#compare" className="text-sm text-gray-400 hover:text-white transition-colors">Compare Models</a></li>
-              <li><a href="#why" className="text-sm text-gray-400 hover:text-white transition-colors">Why IMI</a></li>
-              <li><a href="#testimonials" className="text-sm text-gray-400 hover:text-white transition-colors">Reviews</a></li>
+              <li><a href="/shop" className="text-sm text-gray-400 hover:text-white transition-colors">Products</a></li>
+              <li><a href="/#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a></li>
+              <li><a href="/#compare" className="text-sm text-gray-400 hover:text-white transition-colors">Compare Models</a></li>
+              <li><a href="/#why" className="text-sm text-gray-400 hover:text-white transition-colors">Why IMI</a></li>
+              <li><a href="/#testimonials" className="text-sm text-gray-400 hover:text-white transition-colors">Reviews</a></li>
               <li><a href="/refund-policy" className="text-sm text-gray-400 hover:text-white transition-colors">Refund Policy</a></li>
               <li><a href="/privacy-policy" className="text-sm text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms-and-conditions" className="text-sm text-gray-400 hover:text-white transition-colors">Terms &amp; Conditions</a></li>
             </ul>
           </div>
 
@@ -103,7 +104,7 @@ const Footer = () => {
             © {new Date().getFullYear()} IMI Wearables Pvt. Ltd. All rights reserved.
           </p>
           <div className="flex gap-6 text-xs text-gray-500">
-            <a href="/terms" className="hover:text-gray-300 transition-colors">Terms of Service</a>
+            <a href="/terms-and-conditions" className="hover:text-gray-300 transition-colors">Terms of Service</a>
             <a href="/privacy-policy" className="hover:text-gray-300 transition-colors">Privacy Policy</a>
             <a href="/refund-policy" className="hover:text-gray-300 transition-colors">Refund Policy</a>
           </div>
