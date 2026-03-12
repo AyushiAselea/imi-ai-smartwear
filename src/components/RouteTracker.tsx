@@ -21,9 +21,9 @@ const RouteTracker = () => {
   useEffect(() => {
     trackPageView(location.pathname + location.search);
 
-    // Send page_view to Google Analytics on SPA route change
+    // Send page_view to Google Ads tag on SPA route change
     if (typeof window.gtag === "function") {
-      window.gtag("config", "G-2L86LZED1E", {
+      window.gtag("config", "AW-410617284", {
         page_path: location.pathname + location.search,
       });
     }
