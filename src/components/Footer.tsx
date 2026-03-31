@@ -63,7 +63,7 @@ const Footer = () => {
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
                 <MapPin size={16} className="text-primary shrink-0 mt-0.5" />
-                <span className="text-sm text-gray-400">IMI Wearables<br />611 horizin tower, oppostise mercidies showroom, malviya nagar, Jaipur, India</span>
+                <span className="text-sm text-gray-400">IMI Wearables<br />611 Horizon Tower, opposite Mercedes showroom, Malviya Nagar, Jaipur, India</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={16} className="text-primary shrink-0" />
