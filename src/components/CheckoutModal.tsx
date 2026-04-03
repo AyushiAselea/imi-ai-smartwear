@@ -8,7 +8,7 @@
  *   4. Order placed → show GuestSignupModal if not logged in
  */
 import { useState, useEffect, useRef } from "react";
-import { X, LogIn, CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
+import { X, CheckCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { startPayment } from "@/lib/payment";
@@ -67,6 +67,10 @@ export default function CheckoutModal({
 }: Props) {
   const navigate = useNavigate();
 
+  /* ── Effective token — starts from prop, updated if user logs in inside modal ── */
+  const [effectiveToken, setEffectiveToken] = useState(loggedInToken);
+  const [inlineLoginLoading, setInlineLoginLoading] = useState(false);
+
   /* ── Address state ── */
   const [address, setAddress] = useState<ShippingAddress>({
     fullName: loggedInName,
@@ -114,7 +118,7 @@ export default function CheckoutModal({
     setShowLoginNudge(false);
 
     // Don't check if user is already logged in
-    if (loggedInToken) return;
+    if (effectiveToken) return;
 
     if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
     if (!val || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return;
@@ -147,12 +151,41 @@ export default function CheckoutModal({
     return true;
   };
 
+  /* ── Inline Google login from the "Account found" banner ── */
+  const handleInlineGoogleLogin = async () => {
+    setInlineLoginLoading(true);
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const res = await syncSocialUser(
+        result.user.email!,
+        result.user.displayName || undefined,
+        "google"
+      );
+      localStorage.setItem("imi_token", res.token);
+      setEffectiveToken(res.token);
+      // Pre-fill name/email from Google account
+      setAddress((a) => ({
+        ...a,
+        email: result.user.email || a.email,
+        fullName: a.fullName || result.user.displayName || "",
+      }));
+      setShowLoginNudge(false);
+      toast.success(`Logged in as ${result.user.displayName || result.user.email}`);
+    } catch (err: any) {
+      if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
+        toast.error(err.message || "Google sign-in failed.");
+      }
+    } finally {
+      setInlineLoginLoading(false);
+    }
+  };
+
   /* ── Confirm order ── */
   const handleConfirmOrder = async () => {
     setLoading(true);
     try {
       // Token is either the logged-in user token or empty for guests
-      const token = loggedInToken || "";
+      const token = effectiveToken || "";
       const sessionId = sessionStorage.getItem("imi_session_id") || "";
 
       if (items.length === 1) {
@@ -166,7 +199,7 @@ export default function CheckoutModal({
         if (result.type === "cod") {
           onClearCart?.();
           // Store guest info for signup nudge
-          if (!loggedInToken) {
+          if (!effectiveToken) {
             sessionStorage.setItem("imi_guest_info", JSON.stringify({
               name: address.fullName,
               email: address.email,
@@ -193,7 +226,7 @@ export default function CheckoutModal({
 
         if (result.type === "cod") {
           onClearCart?.();
-          if (!loggedInToken) {
+          if (!effectiveToken) {
             sessionStorage.setItem("imi_guest_info", JSON.stringify({
               name: address.fullName,
               email: address.email,
@@ -346,8 +379,8 @@ export default function CheckoutModal({
                 placeholder="Email Address *"
                 value={address.email}
                 onChange={(e) => handleEmailChange(e.target.value)}
-                disabled={!!loggedInToken}
-                className={`${INPUT} ${loggedInToken ? "opacity-60 cursor-not-allowed" : ""} pr-9`}
+                disabled={!!effectiveToken}
+                className={`${INPUT} ${effectiveToken ? "opacity-60 cursor-not-allowed" : ""} pr-9`}
               />
               {emailChecking && (
                 <Loader2 size={15} className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-muted-foreground" />
@@ -368,20 +401,26 @@ export default function CheckoutModal({
                 >
                   <div>
                     <p className="text-sm font-medium text-foreground">Account found</p>
-                    <p className="text-xs text-muted-foreground">Continue with login for faster checkout?</p>
+                    <p className="text-xs text-muted-foreground">Sign in with Google to continue</p>
                   </div>
                   <div className="flex gap-2 shrink-0">
                     <button
-                      onClick={() => navigate(`/auth?email=${encodeURIComponent(address.email)}`)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity"
+                      onClick={handleInlineGoogleLogin}
+                      disabled={inlineLoginLoading}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
                     >
-                      <LogIn size={13} /> Login
+                      {inlineLoginLoading ? (
+                        <Loader2 size={12} className="animate-spin" />
+                      ) : (
+                        <svg viewBox="0 0 24 24" width="12" height="12"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      )}
+                      {inlineLoginLoading ? "Signing in..." : "Login with Google"}
                     </button>
                     <button
                       onClick={() => setShowLoginNudge(false)}
                       className="px-3 py-1.5 rounded-lg border border-border text-xs font-semibold hover:bg-secondary transition-colors"
                     >
-                      Continue
+                      Continue as Guest
                     </button>
                   </div>
                 </motion.div>
