@@ -556,7 +556,8 @@ const ProductPage = () => {
       const sessionId = sessionStorage.getItem("imi_session_id") || "";
       const backendProductId = getBackendProductId();
       const priceNum = parseInt(product!.price.replace(/[₹,]/g, ""));
-      const payload = backendProductId ? { productId: backendProductId } : { productName: product!.name, price: priceNum };
+      const variantStr = `${selectedFrame} / ${selectedGlass}`;
+      const payload = backendProductId ? { productId: backendProductId, variant: variantStr } : { productName: product!.name, price: priceNum, variant: variantStr };
       const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
       if (result.type === "cod") { toast.success("Order placed successfully! Pay on delivery."); setShowCheckout(false); navigate("/payment/success?method=cod"); }
       // Clear cart after any successful purchase (COD or redirect)
@@ -742,7 +743,7 @@ const ProductPage = () => {
                     setAddingToCart(true);
                     try {
                       const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
-                      await addToCart({ productId: slug || "", name: product.name, price: priceNum, image: currentImage, variant: selectedFrame });
+                      await addToCart({ productId: slug || "", name: product.name, price: priceNum, image: currentImage, variant: `${selectedFrame} / ${selectedGlass}` });
                       toast.success("Added to cart!");
                     } catch (err: any) { toast.error(err.message || "Failed to add to cart"); } finally { setAddingToCart(false); }
                   }}

@@ -139,7 +139,7 @@ export interface ShippingAddress {
 }
 
 export const initiatePayment = (
-  payload: { productId?: string; productName?: string; price?: number },
+  payload: { productId?: string; productName?: string; price?: number; variant?: string },
   quantity: number,
   token: string,
   paymentMethod: string = "ONLINE",

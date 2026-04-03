@@ -91,8 +91,8 @@ const CartPage = () => {
         const item = items[0];
         const backendId = getBackendProductId(item.productId, item.name);
         const payload = backendId
-          ? { productId: backendId }
-          : { productName: item.name, price: item.price };
+          ? { productId: backendId, variant: item.variant || "" }
+          : { productName: item.name, price: item.price, variant: item.variant || "" };
         const result = await startPayment(payload, item.quantity, token, paymentMethod, address, sessionId);
         if (result.type === "cod") {
           await clearCart();
@@ -105,7 +105,7 @@ const CartPage = () => {
         }
       } else {
         // Multiple items — aggregate into one payment
-        const combinedNames = items.map((i) => i.name).join(", ");
+        const combinedNames = items.map((i) => i.variant ? `${i.name} (${i.variant})` : i.name).join(", ");
         const payload = { productName: combinedNames, price: totalAmount };
         const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
         if (result.type === "cod") {
