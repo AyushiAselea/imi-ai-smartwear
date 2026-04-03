@@ -50,9 +50,8 @@ import m2Model4 from "@/assets/mark2_models/Imi web potr.1.jpg.jpeg";
 import m2Model5 from "@/assets/mark2_models/imi web potr.3.jpg.jpeg";
 import m2Model6 from "@/assets/mark2_models/imi web potr.4.jpg.jpeg";
 
-import { startPayment } from "@/lib/payment";
 import { updateCart, syncSocialUser } from "@/lib/api";
-import type { ShippingAddress } from "@/lib/api";
+import CheckoutModal, { type CheckoutItem } from "@/components/CheckoutModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
@@ -442,7 +441,6 @@ const ProductPage = () => {
   const [selectedGlass, setSelectedGlass] = useState("black");
   const [activeThumb, setActiveThumb] = useState(0); // 0 = main, 1/2 = extras
   const [showVideo, setShowVideo] = useState(false);
-  const [buyingLoading, setBuyingLoading] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
   const { user } = useAuth();
   const { addToCart } = useCart();
@@ -466,18 +464,6 @@ const ProductPage = () => {
 
   /* ── Checkout modal state ── */
   const [showCheckout, setShowCheckout] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<"address" | "payment">("address");
-  const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "COD" | "PARTIAL">("ONLINE");
-  const [address, setAddress] = useState<ShippingAddress>({
-    fullName: "",
-    phone: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "India",
-  });
 
   /* ── Derived values ── */
   const frame = product?.frameVariants.find((v) => v.id === selectedFrame) || product?.frameVariants[0];
@@ -514,55 +500,21 @@ const ProductPage = () => {
     }
   }, [slug, product, user]);
 
-  /* ── Buy / Cart handlers ── */
+  /* ── Buy Now handler — no auth required (guest checkout) ── */
   const handleBuyNow = async () => {
-    if (!user) { toast.info("Please sign in to continue with purchase"); navigate("/auth"); return; }
-    let token = localStorage.getItem("imi_token") || "";
-    if (!token && user.email) {
+    // If user is logged in via Google without a backend token, sync first
+    if (user?.email && !localStorage.getItem("imi_token")) {
       try {
-        toast.loading("Connecting to payment server...", { id: "sync-toast" });
+        toast.loading("Connecting...", { id: "sync-toast" });
         const res = await syncSocialUser(user.email, user.displayName || undefined, "google");
         localStorage.setItem("imi_token", res.token);
-        token = res.token;
         toast.dismiss("sync-toast");
       } catch {
         toast.dismiss("sync-toast");
-        toast.error("Unable to reach payment server. Please try again in a moment.");
-        return;
+        // Continue as guest if sync fails
       }
     }
-    if (!token) { toast.info("Please sign in again to continue"); navigate("/auth"); return; }
     setShowCheckout(true);
-    setCheckoutStep("address");
-  };
-
-  const validateAddress = (): boolean => {
-    if (!address.fullName.trim()) { toast.error("Full name is required"); return false; }
-    if (!address.phone.trim() || address.phone.trim().length < 10) { toast.error("Valid phone number is required"); return false; }
-    if (!address.addressLine1.trim()) { toast.error("Address line 1 is required"); return false; }
-    if (!address.city.trim()) { toast.error("City is required"); return false; }
-    if (!address.state.trim()) { toast.error("State is required"); return false; }
-    if (!address.postalCode.trim() || address.postalCode.trim().length < 5) { toast.error("Valid postal code is required"); return false; }
-    return true;
-  };
-
-  const handleProceedToPayment = () => { if (!validateAddress()) return; setCheckoutStep("payment"); };
-
-  const handleConfirmOrder = async () => {
-    setBuyingLoading(true);
-    try {
-      const token = localStorage.getItem("imi_token") || "";
-      if (!token) { toast.error("Session expired. Please sign in again."); navigate("/auth"); return; }
-      const sessionId = sessionStorage.getItem("imi_session_id") || "";
-      const backendProductId = getBackendProductId();
-      const priceNum = parseInt(product!.price.replace(/[₹,]/g, ""));
-      const variantStr = `${selectedFrame} / ${selectedGlass}`;
-      const payload = backendProductId ? { productId: backendProductId, variant: variantStr } : { productName: product!.name, price: priceNum, variant: variantStr };
-      const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
-      if (result.type === "cod") { toast.success("Order placed successfully! Pay on delivery."); setShowCheckout(false); navigate("/payment/success?method=cod"); }
-      // Clear cart after any successful purchase (COD or redirect)
-      try { const { clearCartAPI } = await import("@/lib/api"); const tk = localStorage.getItem("imi_token"); if (tk) await clearCartAPI(tk); } catch {}
-    } catch (err: any) { toast.error(err.message || "Payment failed. Please try again."); } finally { setBuyingLoading(false); }
   };
 
   const priceNum = product ? parseInt(product.price.replace(/[₹,]/g, "")) : 0;
@@ -732,10 +684,9 @@ const ProductPage = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleBuyNow}
-                  disabled={buyingLoading}
-                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity"
                 >
-                  {buyingLoading ? "Processing..." : `Buy Now — ${product.price}`}
+                  {`Buy Now — ${product.price}`}
                 </button>
                 <button
                   onClick={async () => {
@@ -934,63 +885,28 @@ const ProductPage = () => {
 
       {/* ═══════════════ CHECKOUT MODAL ═══════════════ */}
       {showCheckout && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-foreground">{checkoutStep === "address" ? "Shipping Address" : "Payment Method"}</h2>
-              <button onClick={() => setShowCheckout(false)} className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
-            </div>
-
-            {checkoutStep === "address" && (
-              <div className="space-y-3">
-                <input type="text" placeholder="Full Name *" value={address.fullName} onChange={(e) => setAddress({ ...address, fullName: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="tel" placeholder="Phone Number *" value={address.phone} onChange={(e) => setAddress({ ...address, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="text" placeholder="Address Line 1 *" value={address.addressLine1} onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="text" placeholder="Address Line 2 (Optional)" value={address.addressLine2} onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <div className="grid grid-cols-2 gap-3">
-                  <input type="text" placeholder="City *" value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                  <input type="text" placeholder="State *" value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input type="text" placeholder="PIN Code *" value={address.postalCode} onChange={(e) => setAddress({ ...address, postalCode: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                  <input type="text" placeholder="Country" value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                </div>
-                <button onClick={handleProceedToPayment} className="w-full py-3 mt-2 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">Continue to Payment</button>
-              </div>
-            )}
-
-            {checkoutStep === "payment" && (
-              <div className="space-y-4">
-                <div className="rounded-xl bg-background border border-border p-4 space-y-2">
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Product</span><span className="text-foreground font-medium">{product?.name}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Total</span><span className="text-foreground font-bold">₹{priceNum.toLocaleString()}</span></div>
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Ship to</span><span className="text-foreground text-right text-xs max-w-[60%]">{address.addressLine1}, {address.city}</span></div>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Choose Payment</p>
-                  {([
-                    { id: "ONLINE" as const, title: "Pay Full Amount Online", desc: `₹${priceNum.toLocaleString()} via PayU (UPI / Card / Net Banking)` },
-                    { id: "COD" as const, title: "Cash on Delivery", desc: `Pay ₹${priceNum.toLocaleString()} when delivered` },
-                    { id: "PARTIAL" as const, title: "Pay 50% Now", desc: `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} now · ₹${Math.round(priceNum * 0.5).toLocaleString()} on delivery` },
-                  ]).map((opt) => (
-                    <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${paymentMethod === opt.id ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"}`}>
-                      <input type="radio" name="pm" checked={paymentMethod === opt.id} onChange={() => setPaymentMethod(opt.id)} className="accent-primary" />
-                      <div className="flex-1"><p className="text-sm font-medium text-foreground">{opt.title}</p><p className="text-xs text-muted-foreground">{opt.desc}</p></div>
-                    </label>
-                  ))}
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button onClick={() => setCheckoutStep("address")} className="flex-1 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors">Back</button>
-                  <button onClick={handleConfirmOrder} disabled={buyingLoading} className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
-                    {buyingLoading ? "Processing..." : paymentMethod === "COD" ? "Place Order" : paymentMethod === "PARTIAL" ? `Pay ₹${Math.round(priceNum * 0.5).toLocaleString()} Now` : `Pay ₹${priceNum.toLocaleString()}`}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <CheckoutModal
+          items={[{
+            productId: slug || "",
+            backendId: getBackendProductId(),
+            name: product!.name,
+            price: priceNum,
+            quantity: 1,
+            variant: `${selectedFrame} / ${selectedGlass}`,
+          } as CheckoutItem]}
+          totalAmount={priceNum}
+          onClose={() => setShowCheckout(false)}
+          onClearCart={async () => {
+            try {
+              const { clearCartAPI } = await import("@/lib/api");
+              const tk = localStorage.getItem("imi_token");
+              if (tk) await clearCartAPI(tk);
+            } catch {}
+          }}
+          loggedInToken={localStorage.getItem("imi_token") || ""}
+          loggedInEmail={user?.email || ""}
+          loggedInName={user?.displayName || (user as any)?.name || ""}
+        />
       )}
     </>
   );

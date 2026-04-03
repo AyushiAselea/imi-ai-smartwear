@@ -130,6 +130,7 @@ export interface PaymentResponse {
 export interface ShippingAddress {
   fullName: string;
   phone: string;
+  email: string;         // required for guest checkout, used for order confirmation
   addressLine1: string;
   addressLine2?: string;
   city: string;
@@ -138,17 +139,34 @@ export interface ShippingAddress {
   country: string;
 }
 
+export const checkEmail = (email: string): Promise<{ exists: boolean }> =>
+  apiRequest<{ exists: boolean }>("/auth/check-email", {
+    method: "POST",
+    body: { email },
+  });
+
+export const guestRegister = (
+  name: string,
+  email: string,
+  password: string,
+  phone?: string,
+): Promise<AuthResponse> =>
+  apiRequest<AuthResponse>("/auth/register", {
+    method: "POST",
+    body: { name, email, password, phone },
+  });
+
 export const initiatePayment = (
   payload: { productId?: string; productName?: string; price?: number; variant?: string },
   quantity: number,
-  token: string,
+  token: string,   // pass "" for guest checkout
   paymentMethod: string = "ONLINE",
   shippingAddress?: ShippingAddress,
 ): Promise<PaymentResponse> =>
   apiRequest<PaymentResponse>("/payment/create", {
     method: "POST",
     body: { ...payload, quantity, paymentMethod, shippingAddress },
-    token,
+    token: token || undefined,  // omit header for guests
   });
 
 export const verifyPayment = (txnid: string, token: string) =>

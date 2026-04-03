@@ -5,11 +5,10 @@ import { useProducts } from "@/hooks/useProducts";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, ShoppingBag, X } from "lucide-react";
+import { ShoppingCart, Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { startPayment } from "@/lib/payment";
 import { syncSocialUser } from "@/lib/api";
-import type { ShippingAddress } from "@/lib/api";
+import CheckoutModal, { type CheckoutItem } from "@/components/CheckoutModal";
 import { toast } from "sonner";
 
 const CartPage = () => {
@@ -20,19 +19,6 @@ const CartPage = () => {
 
   /* ── Checkout modal state ── */
   const [showCheckout, setShowCheckout] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState<"address" | "payment">("address");
-  const [paymentMethod, setPaymentMethod] = useState<"ONLINE" | "COD" | "PARTIAL">("ONLINE");
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [address, setAddress] = useState<ShippingAddress>({
-    fullName: "",
-    phone: "",
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "India",
-  });
 
   /* ── Helpers ── */
   const getBackendProductId = (cartProductId: string, cartProductName: string): string | null => {
@@ -46,108 +32,26 @@ const CartPage = () => {
     return match ? match._id : null;
   };
 
-  const validateAddress = (): boolean => {
-    if (!address.fullName.trim()) { toast.error("Full name is required"); return false; }
-    if (!address.phone.trim() || address.phone.trim().length < 10) { toast.error("Valid phone number is required"); return false; }
-    if (!address.addressLine1.trim()) { toast.error("Address line 1 is required"); return false; }
-    if (!address.city.trim()) { toast.error("City is required"); return false; }
-    if (!address.state.trim()) { toast.error("State is required"); return false; }
-    if (!address.postalCode.trim() || address.postalCode.trim().length < 5) { toast.error("Valid postal code is required"); return false; }
-    return true;
-  };
-
+  /* ── Open checkout — no auth required (guest checkout) ── */
   const handleProceedToCheckout = async () => {
-    if (!user) { toast.info("Please sign in to continue with purchase"); navigate("/auth"); return; }
-    let token = localStorage.getItem("imi_token") || "";
-    if (!token && user.email) {
+    // If logged-in Google user needs a backend token, sync first
+    if (user?.email && !localStorage.getItem("imi_token")) {
       try {
-        toast.loading("Connecting to payment server...", { id: "sync-toast" });
+        toast.loading("Connecting...", { id: "sync-toast" });
         const res = await syncSocialUser(user.email, user.displayName || undefined, "google");
         localStorage.setItem("imi_token", res.token);
-        token = res.token;
         toast.dismiss("sync-toast");
       } catch {
         toast.dismiss("sync-toast");
-        toast.error("Unable to reach payment server. Please try again in a moment.");
-        return;
       }
     }
-    if (!token) { toast.info("Please sign in again to continue"); navigate("/auth"); return; }
     setShowCheckout(true);
-    setCheckoutStep("address");
-  };
-
-  const handleProceedToPayment = () => { if (!validateAddress()) return; setCheckoutStep("payment"); };
-
-  const handleConfirmOrder = async () => {
-    setCheckoutLoading(true);
-    try {
-      const token = localStorage.getItem("imi_token") || "";
-      if (!token) { toast.error("Session expired. Please sign in again."); navigate("/auth"); return; }
-      const sessionId = sessionStorage.getItem("imi_session_id") || "";
-
-      // Use first item's product ID if single item, otherwise aggregate
-      if (items.length === 1) {
-        const item = items[0];
-        const backendId = getBackendProductId(item.productId, item.name);
-        const payload = backendId
-          ? { productId: backendId, variant: item.variant || "" }
-          : { productName: item.name, price: item.price, variant: item.variant || "" };
-        const result = await startPayment(payload, item.quantity, token, paymentMethod, address, sessionId);
-        if (result.type === "cod") {
-          await clearCart();
-          toast.success("Order placed successfully! Pay on delivery.");
-          setShowCheckout(false);
-          navigate("/payment/success?method=cod");
-        } else {
-          // Online/Partial — redirect to PayU (cart will be cleared on success page)
-          await clearCart();
-        }
-      } else {
-        // Multiple items — aggregate into one payment
-        const combinedNames = items.map((i) => i.variant ? `${i.name} (${i.variant})` : i.name).join(", ");
-        const payload = { productName: combinedNames, price: totalAmount };
-        const result = await startPayment(payload, 1, token, paymentMethod, address, sessionId);
-        if (result.type === "cod") {
-          await clearCart();
-          toast.success("Order placed successfully! Pay on delivery.");
-          setShowCheckout(false);
-          navigate("/payment/success?method=cod");
-        } else {
-          await clearCart();
-        }
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Payment failed. Please try again.");
-    } finally {
-      setCheckoutLoading(false);
-    }
   };
 
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-2 border-primary border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 pt-32">
-          <ShoppingCart size={64} className="text-muted-foreground/30 mb-6" />
-          <h1 className="text-2xl font-bold mb-2">Sign in to view your cart</h1>
-          <p className="text-muted-foreground mb-6">Please log in to add items and manage your cart.</p>
-          <Link
-            to="/auth"
-            className="px-8 py-3 rounded-full bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-opacity"
-          >
-            Sign In
-          </Link>
-        </div>
-        <Footer />
       </div>
     );
   }
@@ -296,71 +200,22 @@ const CartPage = () => {
 
       {/* ═══════════════ CHECKOUT MODAL ═══════════════ */}
       {showCheckout && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-card border border-border rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 shadow-2xl">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-foreground">{checkoutStep === "address" ? "Shipping Address" : "Payment Method"}</h2>
-              <button onClick={() => setShowCheckout(false)} className="p-1 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors"><X size={20} /></button>
-            </div>
-
-            {checkoutStep === "address" && (
-              <div className="space-y-3">
-                <input type="text" placeholder="Full Name *" value={address.fullName} onChange={(e) => setAddress({ ...address, fullName: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="tel" placeholder="Phone Number *" value={address.phone} onChange={(e) => setAddress({ ...address, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="text" placeholder="Address Line 1 *" value={address.addressLine1} onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <input type="text" placeholder="Address Line 2 (Optional)" value={address.addressLine2} onChange={(e) => setAddress({ ...address, addressLine2: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                <div className="grid grid-cols-2 gap-3">
-                  <input type="text" placeholder="City *" value={address.city} onChange={(e) => setAddress({ ...address, city: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                  <input type="text" placeholder="State *" value={address.state} onChange={(e) => setAddress({ ...address, state: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <input type="text" placeholder="PIN Code *" value={address.postalCode} onChange={(e) => setAddress({ ...address, postalCode: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                  <input type="text" placeholder="Country" value={address.country} onChange={(e) => setAddress({ ...address, country: e.target.value })} className="w-full px-4 py-3 rounded-xl bg-background border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary text-sm" />
-                </div>
-                <button onClick={handleProceedToPayment} className="w-full py-3 mt-2 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity">Continue to Payment</button>
-              </div>
-            )}
-
-            {checkoutStep === "payment" && (
-              <div className="space-y-4">
-                <div className="rounded-xl bg-background border border-border p-4 space-y-2">
-                  {items.map((item) => (
-                    <div key={`${item.productId}-${item.variant}`} className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">{item.name} × {item.quantity}</span>
-                      <span className="text-foreground font-medium">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
-                    </div>
-                  ))}
-                  <div className="flex justify-between text-sm border-t border-border pt-2 mt-2">
-                    <span className="text-muted-foreground font-semibold">Total</span>
-                    <span className="text-foreground font-bold">₹{totalAmount.toLocaleString("en-IN")}</span>
-                  </div>
-                  <div className="flex justify-between text-sm"><span className="text-muted-foreground">Ship to</span><span className="text-foreground text-right text-xs max-w-[60%]">{address.addressLine1}, {address.city}</span></div>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Choose Payment</p>
-                  {([
-                    { id: "ONLINE" as const, title: "Pay Full Amount Online", desc: `₹${totalAmount.toLocaleString("en-IN")} via PayU (UPI / Card / Net Banking)` },
-                    { id: "COD" as const, title: "Cash on Delivery", desc: `Pay ₹${totalAmount.toLocaleString("en-IN")} when delivered` },
-                    { id: "PARTIAL" as const, title: "Pay 50% Now", desc: `Pay ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} now · ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} on delivery` },
-                  ]).map((opt) => (
-                    <label key={opt.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${paymentMethod === opt.id ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"}`}>
-                      <input type="radio" name="pm" checked={paymentMethod === opt.id} onChange={() => setPaymentMethod(opt.id)} className="accent-primary" />
-                      <div className="flex-1"><p className="text-sm font-medium text-foreground">{opt.title}</p><p className="text-xs text-muted-foreground">{opt.desc}</p></div>
-                    </label>
-                  ))}
-                </div>
-
-                <div className="flex gap-3 pt-2">
-                  <button onClick={() => setCheckoutStep("address")} className="flex-1 py-3 rounded-full border border-border text-foreground font-semibold text-sm hover:bg-secondary transition-colors">Back</button>
-                  <button onClick={handleConfirmOrder} disabled={checkoutLoading} className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50">
-                    {checkoutLoading ? "Processing..." : paymentMethod === "COD" ? "Place Order" : paymentMethod === "PARTIAL" ? `Pay ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} Now` : `Pay ₹${totalAmount.toLocaleString("en-IN")}`}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <CheckoutModal
+          items={items.map((item) => ({
+            productId: item.productId,
+            backendId: getBackendProductId(item.productId, item.name),
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            variant: item.variant,
+          } as CheckoutItem))}
+          totalAmount={totalAmount}
+          onClose={() => setShowCheckout(false)}
+          onClearCart={() => clearCart()}
+          loggedInToken={localStorage.getItem("imi_token") || ""}
+          loggedInEmail={user?.email || ""}
+          loggedInName={user?.displayName || (user as any)?.name || ""}
+        />
       )}
     </div>
   );

@@ -53,7 +53,7 @@ export interface PaymentResult {
 export async function startPayment(
   payload: { productId?: string; productName?: string; price?: number; variant?: string },
   quantity: number,
-  token: string,
+  token: string,    // pass "" for guest checkout
   paymentMethod: string = "ONLINE",
   shippingAddress?: ShippingAddress,
   sessionId?: string,
