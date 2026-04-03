@@ -262,12 +262,14 @@ export default function CheckoutModal({
     try {
       const result = await createUserWithEmailAndPassword(auth, guestEmail, signupPassword);
       if (guestName) await updateProfile(result.user, { displayName: guestName });
-      // Sync with backend to get JWT
+      // Sync with backend to get JWT — this also links guest orders to the new account
       const res = await syncSocialUser(guestEmail, guestName, "email");
       localStorage.setItem("imi_token", res.token);
       sessionStorage.removeItem("imi_guest_info");
-      setSignupMode("done");
       toast.success("Account created! Welcome to IMI.");
+      // Navigate immediately — user is now signed in to Firebase
+      onClose();
+      navigate("/payment/success?method=cod");
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {
         // Account exists in Firebase — switch to login mode
@@ -290,8 +292,9 @@ export default function CheckoutModal({
       const res = await syncSocialUser(guestEmail, guestName, "email");
       localStorage.setItem("imi_token", res.token);
       sessionStorage.removeItem("imi_guest_info");
-      setSignupMode("done");
-      toast.success("Logged in successfully!");
+      toast.success("Logged in successfully! Your orders are now linked.");
+      onClose();
+      navigate("/payment/success?method=cod");
     } catch (err: any) {
       if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential" || err.code === "auth/invalid-login-credentials") {
         toast.error("Incorrect password. Please try again.");
@@ -311,6 +314,7 @@ export default function CheckoutModal({
     setSignupLoading(true);
     try {
       const result = await signInWithPopup(auth, googleProvider);
+      // syncSocialUser also links any guest orders placed with this email
       const res = await syncSocialUser(
         result.user.email!,
         result.user.displayName || guestName,
@@ -318,8 +322,9 @@ export default function CheckoutModal({
       );
       localStorage.setItem("imi_token", res.token);
       sessionStorage.removeItem("imi_guest_info");
-      setSignupMode("done");
-      toast.success(`Welcome, ${result.user.displayName || result.user.email}!`);
+      toast.success(`Welcome, ${result.user.displayName || result.user.email}! Your order is saved.`);
+      onClose();
+      navigate("/payment/success?method=cod");
     } catch (err: any) {
       if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") {
         toast.error(err.message || "Google sign-in failed.");
