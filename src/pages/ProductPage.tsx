@@ -18,10 +18,14 @@ import m1_white_black from "@/assets/mark_1/mark1_white_black.png";
 import m1_white_white from "@/assets/mark_1/mark1_white_white (1).png";
 import m1_white_white2 from "@/assets/mark_1/mark1_white_white (2).png";
 import m1_back_black from "@/assets/mark_1/mark1_back_black2.png";
-import m1_back_white from "@/assets/mark_1/mark1_back_white(glasses).png";
+import m1_back_white2 from "@/assets/mark_1/mark1_back_white(glasses).png";
 import m1_back_white1 from "@/assets/mark_1/mark1_back_white1(glasses).jpeg";
 import m1_black_balck1 from "@/assets/mark_1/mark1_black_balck1.png";
+import m1_white_black1 from "@/assets/mark_1/mark1_white_black1.png";
 import m1_white_black2 from "@/assets/mark_1/mark1_white_black2.png";
+import m1_white_white1 from "@/assets/mark_1/mark_1_white.jpeg";
+
+
 
 /* ──────────────── Mark 2 product images (frame_glass) ──────────────── */
 import m2_black_black from "@/assets/mark2/mark2_black_black.png";
@@ -42,6 +46,8 @@ import m1Model3 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.03
 import m1Model4 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.22 PM.jpeg";
 import m1Model5 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.35.36 PM.jpeg";
 import m1Banner from "@/assets/mark2_models/app store deploy.jpg.jpeg";
+import handsfree from "@/assets/handsfree.png";
+import communication from "@/assets/communications.png";
 
 import m2Model1 from "@/assets/mark2_models/mark_2_1.jpeg";
 import m2Model2 from "@/assets/mark2_models/mark_2_2.jpeg";
@@ -56,6 +62,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
+import { i } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 
 /* ================================================================== */
 /*  TYPES                                                              */
@@ -146,7 +153,7 @@ const productData: Record<string, ProductInfo> = {
         },
         extraImages: {
           black: [m1_black_balck1, m1_back_black],
-          transparent: [m1_back_white1, m1_black_balck1],
+          transparent: [m1_back_white1, m1_back_white2],
         },
       },
       {
@@ -158,8 +165,8 @@ const productData: Record<string, ProductInfo> = {
           transparent: m1_white_white,
         },
         extraImages: {
-          black: [m1_white_black2, m1_back_black],
-          transparent: [m1_white_white2, m1_back_white],
+          black: [m1_white_black2, m1_white_black1],
+          transparent: [m1_white_white2, m1_white_white1],
         },
       },
     ],
@@ -200,14 +207,14 @@ const productData: Record<string, ProductInfo> = {
         title: "Immersive audio",
         description:
           "Enjoy your favourite music with speakers built right into the frames. Listen to Spotify, Apple Music, and more with just a tap.",
-        image: m1Banner,
+        image: communication,
       },
       {
         icon: Phone,
         title: "Hands-free communication",
         description:
           "Make calls straight from your glasses. Send and receive texts and voice messages hands-free. You can even share your unique POV thanks to smart connectivity.",
-        image: m1Banner,
+        image: handsfree,
       },
     ],
     featureCategories: [
@@ -775,7 +782,7 @@ const ProductPage = () => {
                   <div className={`rounded-2xl overflow-hidden bg-muted ${i % 2 !== 0 && !card.wide ? "md:order-1" : ""}`}>
                     {card.video ? (
                       <div className="relative group cursor-pointer aspect-video">
-                        <video src={card.video} className="w-full h-full object-cover" muted playsInline loop preload="metadata"
+                        <video src={card.video} className="w-full h-full object-cover" autoPlay muted playsInline loop preload="metadata"
                           onMouseEnter={(e) => (e.target as HTMLVideoElement).play()}
                           onMouseLeave={(e) => { const v = e.target as HTMLVideoElement; v.pause(); v.currentTime = 0; }}
                         />
