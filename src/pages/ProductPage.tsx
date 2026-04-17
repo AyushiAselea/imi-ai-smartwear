@@ -26,7 +26,6 @@ import m1_white_black2 from "@/assets/mark_1/mark1_white_black2.png";
 import m1_white_white1 from "@/assets/mark_1/mark_1_white.jpeg";
 
 
-
 /* ──────────────── Mark 2 product images (frame_glass) ──────────────── */
 import m2_black_black from "@/assets/mark2/mark2_black_black.png";
 import m2_black_white from "@/assets/mark2/mark2_black_white.png";
