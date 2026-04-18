@@ -755,7 +755,7 @@ const ProductPage = () => {
               </div>
 
               {/* Powered by Gemini */}
-              <div className="flex items-center gap-2.5 py-1">
+              {/* <div className="flex items-center gap-2.5 py-1">
                 <span className="text-xs text-muted-foreground font-medium tracking-wide">AI powered by</span>
                 <span className="flex items-center gap-1.5">
                   <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
@@ -771,7 +771,7 @@ const ProductPage = () => {
                   </svg>
                   <span className="text-sm font-semibold text-foreground">Gemini</span>
                 </span>
-              </div>
+              </div> */}
 
               {/* Price */}
               <div className="flex items-baseline gap-3">
@@ -788,7 +788,7 @@ const ProductPage = () => {
                   onClick={handleBuyNow}
                   className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity"
                 >
-                  {`Buy Now — ${product.price}`}
+                  {`Buy Now   ${product.price}`}
                 </button>
                 <button
                   onClick={async () => {
