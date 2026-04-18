@@ -61,7 +61,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/hooks/useCart";
 import { toast } from "sonner";
 import { useProducts } from "@/hooks/useProducts";
-import { i } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
+import type { ProductVariant } from "@/lib/api";
 
 /* ================================================================== */
 /*  TYPES                                                              */
@@ -429,6 +429,58 @@ const badges = [
 ];
 
 /* ================================================================== */
+/*  DYNAMIC VARIANT BUILDER                                            */
+/* ================================================================== */
+
+const FRAME_META: Record<string, { id: string; label: string; colorHex: string }> = {
+  Black: { id: "black", label: "Matte Black", colorHex: "#111" },
+  White: { id: "white", label: "Pearl White", colorHex: "#f5f5f5" },
+  Blue:  { id: "blue",  label: "Ocean Blue",  colorHex: "#2563eb" },
+};
+
+function parseLensId(variantName: string): string {
+  return variantName.toLowerCase().includes("transparent") ? "transparent" : "black";
+}
+
+function buildDynamicVariants(
+  backendVariants: ProductVariant[],
+  staticFrameVariants: FrameVariant[]
+): { frameVariants: FrameVariant[]; glassOptions: GlassOption[] } | null {
+  if (!backendVariants?.length) return null;
+
+  const lensSet = new Set<string>();
+  const frameMap = new Map<string, { meta: { id: string; label: string; colorHex: string }; images: Record<string, string>; extraImages: Record<string, string[]> }>();
+
+  for (const v of backendVariants) {
+    const frameType = v.frameType || v.color;
+    const meta = FRAME_META[frameType] || { id: frameType.toLowerCase(), label: frameType, colorHex: v.colorHex || "#888" };
+    const lensId = parseLensId(v.variantName);
+    lensSet.add(lensId);
+    if (!frameMap.has(frameType)) {
+      const staticFrame = staticFrameVariants.find((sf) => sf.id === meta.id);
+      frameMap.set(frameType, { meta, images: {}, extraImages: staticFrame?.extraImages ?? {} });
+    }
+    const entry = frameMap.get(frameType)!;
+    entry.images[lensId] = v.image;
+  }
+
+  const frameVariants: FrameVariant[] = Array.from(frameMap.values()).map(({ meta, images, extraImages }) => ({
+    id: meta.id,
+    label: meta.label,
+    colorHex: meta.colorHex,
+    images,
+    extraImages,
+  }));
+
+  const lensOrder = ["black", "transparent"];
+  const glassOptions: GlassOption[] = lensOrder
+    .filter((lid) => lensSet.has(lid))
+    .map((lid) => ({ id: lid, label: lid === "transparent" ? "Transparent" : "Black Glass" }));
+
+  return { frameVariants, glassOptions };
+}
+
+/* ================================================================== */
 /*  COMPONENT                                                          */
 /* ================================================================== */
 
@@ -452,6 +504,22 @@ const ProductPage = () => {
   const { addToCart } = useCart();
   const { products: backendProducts } = useProducts();
 
+  // Find matching backend product by name
+  const backendProduct = backendProducts.find(
+    (bp) =>
+      bp.name.toLowerCase().includes((product?.name ?? "").toLowerCase().replace("imi ", "")) ||
+      bp.name.toLowerCase() === (product?.name ?? "").toLowerCase()
+  );
+
+  // Build dynamic frame variants from backend (falls back to static when backend has none)
+  const dynamicVariants =
+    backendProduct && product
+      ? buildDynamicVariants(backendProduct.variants ?? [], product.frameVariants)
+      : null;
+
+  const effectiveFrameVariants = dynamicVariants?.frameVariants ?? product?.frameVariants ?? [];
+  const effectiveGlassOptions  = dynamicVariants?.glassOptions  ?? product?.glassOptions  ?? [];
+
   // Scroll to top + reset on route change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -461,6 +529,31 @@ const ProductPage = () => {
     setActiveThumb(0);
     setShowVideo(false);
   }, [slug, variantParam]);
+
+  // When backend variants arrive, reset selectedFrame if it no longer exists
+  useEffect(() => {
+    if (effectiveFrameVariants.length > 0 && !effectiveFrameVariants.some((v) => v.id === selectedFrame)) {
+      setSelectedFrame(effectiveFrameVariants[0].id);
+    }
+  }, [effectiveFrameVariants]);
+
+  // When backend glass options arrive, reset selectedGlass if it no longer exists
+  useEffect(() => {
+    if (effectiveGlassOptions.length > 0 && !effectiveGlassOptions.some((g) => g.id === selectedGlass)) {
+      setSelectedGlass(effectiveGlassOptions[0].id);
+    }
+  }, [effectiveGlassOptions]);
+
+  // When the selected frame changes, reset selectedGlass if the current glass
+  // is not available for the new frame (i.e. no backend image for that combo)
+  useEffect(() => {
+    const currentFrame = effectiveFrameVariants.find((v) => v.id === selectedFrame) || effectiveFrameVariants[0];
+    if (!currentFrame) return;
+    const available = effectiveGlassOptions.filter((g) => !!currentFrame.images[g.id]);
+    if (available.length > 0 && !available.some((g) => g.id === selectedGlass)) {
+      setSelectedGlass(available[0].id);
+    }
+  }, [selectedFrame, effectiveFrameVariants, effectiveGlassOptions]);
 
   // Reset thumb when selections change
   useEffect(() => {
@@ -472,20 +565,15 @@ const ProductPage = () => {
   const [showCheckout, setShowCheckout] = useState(false);
 
   /* ── Derived values ── */
-  const frame = product?.frameVariants.find((v) => v.id === selectedFrame) || product?.frameVariants[0];
+  const frame = effectiveFrameVariants.find((v) => v.id === selectedFrame) || effectiveFrameVariants[0];
   const mainImage = frame?.images[selectedGlass] || "";
   const extraImages = frame?.extraImages[selectedGlass] || [];
   const allImages = [mainImage, ...extraImages];
   const currentImage = allImages[activeThumb] || mainImage;
 
   const getBackendProductId = (): string | null => {
-    if (!product || backendProducts.length === 0) return null;
-    const match = backendProducts.find(
-      (bp: any) =>
-        bp.name.toLowerCase().includes(product.name.toLowerCase().replace("imi ", "")) ||
-        bp.name.toLowerCase() === product.name.toLowerCase()
-    );
-    return match ? match._id : null;
+    if (!backendProduct) return null;
+    return backendProduct._id;
   };
 
   // Abandoned cart tracking
@@ -615,7 +703,15 @@ const ProductPage = () => {
               <div className="space-y-3">
                 <h3 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground">Glass Type</h3>
                 <div className="flex gap-3">
-                  {product.glassOptions.map((g) => {
+                  {effectiveGlassOptions
+                    .filter((g) => {
+                      // When using dynamic backend variants, only show glass types
+                      // that the currently selected frame actually has an image for.
+                      // For static fallback (no dynamicVariants), always show all.
+                      if (!dynamicVariants) return true;
+                      return !!frame?.images[g.id];
+                    })
+                    .map((g) => {
                     const thumb = frame?.images[g.id] || "";
                     return (
                       <button
@@ -644,7 +740,7 @@ const ProductPage = () => {
                   <span className="text-sm font-semibold text-foreground">{frame?.label}</span>
                 </div>
                 <div className="flex gap-3">
-                  {product.frameVariants.map((v) => (
+                  {effectiveFrameVariants.map((v) => (
                     <button
                       key={v.id}
                       onClick={() => setSelectedFrame(v.id)}

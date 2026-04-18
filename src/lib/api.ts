@@ -39,6 +39,17 @@ async function apiRequest<T>(endpoint: string, options: RequestOptions = {}): Pr
 
 // ─── Product APIs ────────────────────────────────────────────
 
+export interface ProductVariant {
+  _id: string;
+  variantName: string;
+  color: string;
+  colorHex: string;
+  frameType: string;
+  price: number;
+  stock: number;
+  image: string;
+}
+
 export interface Product {
   _id: string;
   name: string;
@@ -50,6 +61,7 @@ export interface Product {
   category: string;
   status: string;
   createdAt: string;
+  variants: ProductVariant[];
 }
 
 export interface ProductsResponse {

@@ -5,6 +5,8 @@ import { useEffect } from "react";
 import { Mic, Brain, Phone, Music, Eye, Camera, Wifi, Database, Clock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useProducts } from "@/hooks/useProducts";
+import type { Product } from "@/lib/api";
 
 import mark1Img from "@/assets/mark_1/mark1_black_black.png";
 import mark1WhiteImg from "@/assets/mark_1/mark1_white_black.png";
@@ -141,6 +143,82 @@ const allProducts: ProductCard[] = [
   },
 ];
 
+/* ─── Helpers to build cards from backend products ─── */
+
+const FRAME_META: Record<string, { label: string; colorClass: string; variantId: string }> = {
+  Black: { label: "Matte Black", colorClass: "bg-gray-900", variantId: "black" },
+  White: { label: "Pearl White", colorClass: "bg-white border border-gray-300", variantId: "white" },
+  Blue:  { label: "Ocean Blue",  colorClass: "bg-blue-600", variantId: "blue"  },
+};
+
+function getSlugFromProduct(p: Product): string {
+  const n = p.name.toLowerCase();
+  if (n.includes("mark 1")) return "mark-1";
+  if (n.includes("mark 2")) return "mark-2";
+  return "";
+}
+
+function buildCardsFromBackend(products: Product[]): { mark1: ProductCard[]; mark2: ProductCard[] } {
+  const mark1: ProductCard[] = [];
+  const mark2: ProductCard[] = [];
+
+  for (const p of products) {
+    const slug = getSlugFromProduct(p);
+    if (!slug) continue;
+
+    const variants = p.variants ?? [];
+    // Group variants by frameType, keep first occurrence per frame
+    const seenFrames = new Set<string>();
+    const frameCards: ProductCard[] = [];
+
+    for (const v of variants) {
+      const frameType = v.frameType || v.color || "Black";
+      if (seenFrames.has(frameType)) continue;
+      seenFrames.add(frameType);
+
+      const meta = FRAME_META[frameType] ?? { label: frameType, colorClass: "bg-gray-500", variantId: frameType.toLowerCase() };
+      frameCards.push({
+        slug,
+        name: p.name,
+        variant: meta.label,
+        variantColor: meta.colorClass,
+        tagline: p.category || "",
+        price: `₹${v.price.toLocaleString("en-IN")}`,
+        originalPrice: "",
+        image: v.image || p.image,
+        premium: slug === "mark-2",
+        features: [],
+      });
+    }
+
+    // If product has no variants, create a single card from product-level data
+    if (frameCards.length === 0) {
+      frameCards.push({
+        slug,
+        name: p.name,
+        variant: "",
+        variantColor: "bg-gray-900",
+        tagline: p.category || "",
+        price: `₹${p.price.toLocaleString("en-IN")}`,
+        originalPrice: "",
+        image: p.image,
+        premium: slug === "mark-2",
+        features: [],
+      });
+    }
+
+    if (slug === "mark-1") mark1.push(...frameCards);
+    else mark2.push(...frameCards);
+  }
+
+  return { mark1, mark2 };
+}
+
+// Static cards for each product line (fallback when backend has no data)
+const staticMark1 = allProducts.filter((p) => p.name === "IMI Mark 1");
+const staticMark2 = allProducts.filter((p) => p.name === "IMI Mark 2");
+const staticUpcoming = allProducts.filter((p) => p.upcoming);
+
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
   visible: (i: number) => ({
@@ -151,6 +229,15 @@ const fadeUp = {
 };
 
 const Shop = () => {
+  const { products: backendProducts, loading } = useProducts();
+
+  const { mark1: dynMark1, mark2: dynMark2 } = backendProducts.length
+    ? buildCardsFromBackend(backendProducts)
+    : { mark1: [], mark2: [] };
+
+  const mark1Cards = dynMark1.length ? dynMark1 : staticMark1;
+  const mark2Cards = dynMark2.length ? dynMark2 : staticMark2;
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -191,11 +278,13 @@ const Shop = () => {
               IMI Mark 1
             </motion.h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allProducts
-                .filter((p) => p.name === "IMI Mark 1")
-                .map((product, i) => (
+              {loading && !mark1Cards.length ? (
+                <p className="text-muted-foreground col-span-3 text-center py-8">Loading products...</p>
+              ) : (
+                mark1Cards.map((product, i) => (
                   <ProductCardItem key={`mark1-${i}`} product={product} index={i} />
-                ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -214,11 +303,13 @@ const Shop = () => {
               </span>
             </motion.h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allProducts
-                .filter((p) => p.name === "IMI Mark 2")
-                .map((product, i) => (
+              {loading && !mark2Cards.length ? (
+                <p className="text-muted-foreground col-span-3 text-center py-8">Loading products...</p>
+              ) : (
+                mark2Cards.map((product, i) => (
                   <ProductCardItem key={`mark2-${i}`} product={product} index={i} />
-                ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -237,11 +328,9 @@ const Shop = () => {
               </span>
             </motion.h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {allProducts
-                .filter((p) => p.upcoming)
-                .map((product, i) => (
-                  <ProductCardItem key={`pro-${i}`} product={product} index={i} />
-                ))}
+              {staticUpcoming.map((product, i) => (
+                <ProductCardItem key={`pro-${i}`} product={product} index={i} />
+              ))}
             </div>
           </div>
         </div>
