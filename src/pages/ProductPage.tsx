@@ -37,6 +37,9 @@ import m2_black_black1 from "@/assets/mark2/mark2_black_black1.png";
 import m2_black_white1 from "@/assets/mark2/mark2_black_white1.png";
 import m2_blue_black1 from "@/assets/mark2/mark2_blue_black1.png";
 import m2_white_black1 from "@/assets/mark2/mark2_white_black1.png";
+import m2_white_black2 from "@/assets/mark2/mark2_white_black2.png";
+import m2_white_white1 from "@/assets/mark2/mark2_white_white3.png";
+import m2_white_white2 from "@/assets/mark2/mark2_white_white2.png";
 
 /* ──────────────── Model / lifestyle shots ──────────────── */
 import m1Model1 from "@/assets/mark1_models/WhatsApp Image 2026-02-25 at 7.34.08 PM.jpeg";
@@ -51,7 +54,7 @@ import communication from "@/assets/communications.png";
 import m2Model1 from "@/assets/mark2_models/mark_2_1.jpeg";
 import m2Model2 from "@/assets/mark2_models/mark_2_2.jpeg";
 import m2Model3 from "@/assets/mark2_models/mark_2_3.jpeg";
-import m2Model4 from "@/assets/mark2_models/Imi web potr.1.jpg.jpeg";
+import m2Model4 from "@/assets/mark2_visionAI.jpeg";
 import m2Model5 from "@/assets/mark2_models/imi web potr.3.jpg.jpeg";
 import m2Model6 from "@/assets/mark2_models/imi web potr.4.jpg.jpeg";
 
@@ -285,8 +288,8 @@ const productData: Record<string, ProductInfo> = {
           transparent: m2_white_white,
         },
         extraImages: {
-          black: [m2_white_black1, m2_black_white1],
-          transparent: [m2_white_black1, m2_black_white1],
+          black: [m2_white_black1, m2_white_black2],
+          transparent: [m2_white_white1, m2_white_white2],
         },
       },
       {
