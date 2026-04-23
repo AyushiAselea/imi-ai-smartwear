@@ -508,7 +508,9 @@ export default function CheckoutModal({
         )}
 
         {/* ══════════════ STEP 2: PAYMENT ══════════════ */}
-        {step === "payment" && (
+        {step === "payment" && (() => {
+          const onlineAmount = Math.round(totalAmount * 0.95);
+          return (
           <div className="space-y-4">
             {/* Order summary */}
             <div className="rounded-xl bg-background border border-border p-4 space-y-2">
@@ -526,6 +528,18 @@ export default function CheckoutModal({
                 <span className="text-muted-foreground font-semibold">Total</span>
                 <span className="text-foreground font-bold">₹{totalAmount.toLocaleString("en-IN")}</span>
               </div>
+              {paymentMethod === "ONLINE" && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-green-500 font-semibold">Online Discount (5% OFF)</span>
+                  <span className="text-green-500 font-bold">- ₹{(totalAmount - onlineAmount).toLocaleString("en-IN")}</span>
+                </div>
+              )}
+              {paymentMethod === "ONLINE" && (
+                <div className="flex justify-between text-sm border-t border-border pt-2 mt-1">
+                  <span className="text-foreground font-bold">You Pay</span>
+                  <span className="text-primary font-bold text-base">₹{onlineAmount.toLocaleString("en-IN")}</span>
+                </div>
+              )}
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Ship to</span>
                 <span className="text-foreground text-right max-w-[60%]">
@@ -540,24 +554,36 @@ export default function CheckoutModal({
               {([
                 {
                   id: "ONLINE" as const,
-                  title: "Pay Full Amount Online",
-                  desc: `₹${totalAmount.toLocaleString("en-IN")} via PayU (UPI / Card / Net Banking)`,
+                  title: "Pay Online",
+                  badge: "5% OFF",
+                  original: `₹${totalAmount.toLocaleString("en-IN")}`,
+                  desc: `₹${onlineAmount.toLocaleString("en-IN")} via UPI / Card / Net Banking`,
                 },
                 {
                   id: "COD" as const,
                   title: "Cash on Delivery",
+                  badge: null,
+                  original: null,
                   desc: `Pay ₹${totalAmount.toLocaleString("en-IN")} when delivered`,
                 },
                 {
                   id: "PARTIAL" as const,
                   title: "Pay 50% Now",
+                  badge: null,
+                  original: null,
                   desc: `Pay ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} now · ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} on delivery`,
                 },
               ]).map((opt) => (
                 <label
                   key={opt.id}
                   className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${
-                    paymentMethod === opt.id ? "border-primary bg-primary/5" : "border-border hover:border-foreground/30"
+                    opt.id === "ONLINE"
+                      ? paymentMethod === opt.id
+                        ? "border-green-500 bg-green-500/8 ring-1 ring-green-500/30"
+                        : "border-green-500/40 hover:border-green-500 bg-green-500/5"
+                      : paymentMethod === opt.id
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-foreground/30"
                   }`}
                 >
                   <input
@@ -568,8 +594,22 @@ export default function CheckoutModal({
                     className="accent-primary"
                   />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-foreground">{opt.title}</p>
-                    <p className="text-xs text-muted-foreground">{opt.desc}</p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-foreground">{opt.title}</p>
+                      {opt.badge && (
+                        <span className="px-2 py-0.5 rounded-full bg-green-500 text-white text-[10px] font-bold tracking-wide">
+                          {opt.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {opt.original && (
+                        <span className="text-xs text-muted-foreground line-through">{opt.original}</span>
+                      )}
+                      <p className={`text-xs ${opt.id === "ONLINE" ? "text-green-500 font-semibold" : "text-muted-foreground"}`}>
+                        {opt.desc}
+                      </p>
+                    </div>
                   </div>
                 </label>
               ))}
@@ -582,7 +622,11 @@ export default function CheckoutModal({
               <button
                 onClick={handleConfirmOrder}
                 disabled={loading}
-                className="flex-1 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                className={`flex-1 py-3 rounded-full font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-50 ${
+                  paymentMethod === "ONLINE"
+                    ? "bg-green-500 text-white"
+                    : "bg-primary text-primary-foreground"
+                }`}
               >
                 {loading
                   ? "Processing..."
@@ -590,11 +634,12 @@ export default function CheckoutModal({
                   ? "Place Order"
                   : paymentMethod === "PARTIAL"
                   ? `Pay ₹${Math.round(totalAmount * 0.5).toLocaleString("en-IN")} Now`
-                  : `Pay ₹${totalAmount.toLocaleString("en-IN")}`}
+                  : `Pay ₹${onlineAmount.toLocaleString("en-IN")} (5% OFF)`}
               </button>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* ══════════════ STEP 3: POST-ORDER SIGNUP NUDGE ══════════════ */}
         {step === "signup_nudge" && (
