@@ -33,7 +33,7 @@ const allProducts: ProductCard[] = [
   {
     slug: "mark-1",
     name: "IMI Mark 1",
-    variant: "Matte Black",
+    variant: "Glossy Black",
     variantColor: "bg-gray-900",
     tagline: "Smart Everyday AI Glasses",
     price: "₹2,499",
@@ -146,7 +146,7 @@ const allProducts: ProductCard[] = [
 /* ─── Helpers to build cards from backend products ─── */
 
 const FRAME_META: Record<string, { label: string; colorClass: string; variantId: string }> = {
-  Black: { label: "Matte Black", colorClass: "bg-gray-900", variantId: "black" },
+  Black: { label: "Black", colorClass: "bg-gray-900", variantId: "black" },
   White: { label: "Pearl White", colorClass: "bg-white border border-gray-300", variantId: "white" },
   Blue:  { label: "Ocean Blue",  colorClass: "bg-blue-600", variantId: "blue"  },
 };

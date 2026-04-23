@@ -436,7 +436,7 @@ const badges = [
 /* ================================================================== */
 
 const FRAME_META: Record<string, { id: string; label: string; colorHex: string }> = {
-  Black: { id: "black", label: "Matte Black", colorHex: "#111" },
+  Black: { id: "black", label: "Black", colorHex: "#111" },
   White: { id: "white", label: "Pearl White", colorHex: "#f5f5f5" },
   Blue:  { id: "blue",  label: "Ocean Blue",  colorHex: "#2563eb" },
 };
