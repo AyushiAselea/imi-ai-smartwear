@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ProductShowcaseSection from "@/components/ProductShowcaseSection";
 import VideoCarousel from "@/components/VideoCarousel";
+import MobiKwikSection from "@/components/MobiKwikSection";
 
 import FeaturesSection from "@/components/FeaturesSection";
 import ComparisonSection from "@/components/ComparisonSection";
@@ -28,6 +29,7 @@ const Index = () => {
       <main>
         <HeroSection />
         <VideoCarousel />
+        <MobiKwikSection />
         <ProductShowcaseSection />
         <VersionsSection />
         <ExploreTechSection />
