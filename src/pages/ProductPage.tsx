@@ -137,7 +137,7 @@ const productData: Record<string, ProductInfo> = {
     tagline: "Smart Everyday AI Glasses",
     description:
       "Affordable AI glasses built for everyday smart lifestyle. Voice-activated, AI-powered, and designed for the modern Indian user. Say \"Hey IMI\" and get answers quickly. The game will never be the same with IMI Mark 1.",
-    price: "₹2,499",
+    price: "₹2,999",
     originalPrice: "₹5,999",
     video: mark1Video,
     glassOptions: [
