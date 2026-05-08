@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause } from "lucide-react";
 
 const videos = [
-  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027820/imi_ved3_vnjdl5.mp4", title: "IMI Smart Features" },
-  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027816/imi_ved2_akl631.mp4", title: "IMI in Action" },
-  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027791/imi_ved3_yzdei3.mp4", title: "Everyday Style" },
-  { src: "https://res.cloudinary.com/dvvifezwm/video/upload/v1772027803/imi_ved4_l3lh7b.mp4", title: "AI Vision" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234577/imi_ved3_bu8vpc.mp4", title: "IMI Smart Features" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234555/imi_ved3_maajy8.mp4", title: "IMI in Action" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234555/imi_ved2_auxsjt.mp4", title: "Everyday Style" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234554/imi_ved4_m11k7f.mp4", title: "AI Vision" },
 ];
 
 const VideoCarousel = () => {
