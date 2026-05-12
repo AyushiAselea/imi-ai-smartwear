@@ -8,6 +8,7 @@ import MobiKwikSection from "@/components/MobiKwikSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import ComparisonSection from "@/components/ComparisonSection";
 import VersionsSection from "@/components/VersionsSection";
+import OrderEnquiryForm from "@/components/OrderEnquiryForm";
 import ExploreTechSection from "@/components/ExploreTechSection";
 import WhyImiSection from "@/components/WhyImiSection";
 import TestimonialsSection from "@/components/TestimonialsSection";
@@ -32,12 +33,13 @@ const Index = () => {
         <MobiKwikSection />
         <ProductShowcaseSection />
         <VersionsSection />
+        <OrderEnquiryForm />
         <ExploreTechSection />
         <TestimonialsSection />
         <ComparisonSection />
         <FeaturesSection />
         <WhyImiSection />
-        
+
         <CtaSection />
       </main>
       <Footer />
