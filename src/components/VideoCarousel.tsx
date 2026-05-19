@@ -7,6 +7,9 @@ const videos = [
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234555/imi_ved3_maajy8.mp4", title: "IMI in Action" },
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234555/imi_ved2_auxsjt.mp4", title: "Everyday Style" },
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778234554/imi_ved4_m11k7f.mp4", title: "AI Vision" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1779188889/Control_your_world_without_lifting_a_finger_Just_say_Hey_IMI_and_let_your_glasses_do_the_r_sg6emz.mp4", title: "Voice Control" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1779188827/Your_AI_now_on_your_eyes_Capture_moments_talk_smarter_and_stay_connected_all_hands-free.IM_f0nett.mp4", title: "AI on Your Eyes" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1779188825/Control_your_world_without_lifting_a_finger_Just_say_Hey_IMI_and_let_your_glasses_do_the_r_1_kajxhf.mp4", title: "Hands-Free Control" },
 ];
 
 const VideoCarousel = () => {
