@@ -116,7 +116,7 @@ const RefundPolicy = () => {
                 <a href="tel:+919024194918" className="text-primary hover:underline">+91 9024194918</a>
               </p>
               <p className="text-gray-300">
-                <span className="text-white font-medium">Address:</span> 611 Horizon Tower, Opposite Mercedes Showroom, Malviya Nagar, Jaipur, Rajasthan, India
+                <span className="text-white font-medium">Address:</span> Aselea Network, Third Floor, Shop No 230/CS/15-16, RHB, Pratap Nagar, Sanganer, Jaipur, Rajasthan - 302033, India
               </p>
               <p className="text-gray-300">
                 <span className="text-white font-medium">Website:</span>{" "}

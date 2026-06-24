@@ -18,6 +18,8 @@ import ProfilePage from "./pages/ProfilePage";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import RefundPolicy from "./pages/RefundPolicy";
+import ShippingPolicy from "./pages/ShippingPolicy";
+import AboutUs from "./pages/AboutUs";
 import { useEffect } from "react";
 import { initAnalytics } from "@/lib/analytics";
 import { loadTrackingScripts } from "@/lib/tracking";
@@ -55,6 +57,8 @@ const App = () => {
                   <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                   <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                   <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                  <Route path="/about-us" element={<AboutUs />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

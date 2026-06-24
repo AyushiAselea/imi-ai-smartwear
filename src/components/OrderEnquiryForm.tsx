@@ -74,7 +74,7 @@ const OrderEnquiryForm = () => {
   };
 
   return (
-    <section className="py-24 px-4 bg-background">
+    <section id="hey-imi-enquiry" className="py-24 px-4 bg-background">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

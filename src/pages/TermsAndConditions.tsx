@@ -244,7 +244,7 @@ const TermsAndConditions = () => {
                 <a href="mailto:tanay@imiglasses.com" className="text-primary hover:underline">tanay@imiglasses.com</a>
               </p>
               <p className="text-gray-300">
-                <span className="text-white font-medium">Address:</span> 611 Horizon Tower, Opposite Mercedes Showroom, Malviya Nagar, Jaipur, Rajasthan, India
+                <span className="text-white font-medium">Address:</span> Aselea Network, Third Floor, Shop No 230/CS/15-16, RHB, Pratap Nagar, Sanganer, Jaipur, Rajasthan - 302033, India
               </p>
               <p className="text-gray-300">
                 <span className="text-white font-medium">Phone:</span>{" "}
@@ -272,7 +272,7 @@ const TermsAndConditions = () => {
                 <a href="mailto:tanay@imiglasses.com" className="text-primary hover:underline">tanay@imiglasses.com</a>
               </p>
               <p className="text-gray-300">
-                <span className="text-white font-medium">Address:</span> 611 Horizon Tower, Opposite Mercedes Showroom, Malviya Nagar, Jaipur, Rajasthan, India
+                <span className="text-white font-medium">Address:</span> Aselea Network, Third Floor, Shop No 230/CS/15-16, RHB, Pratap Nagar, Sanganer, Jaipur, Rajasthan - 302033, India
               </p>
               <p className="text-gray-300">
                 <span className="text-white font-medium">Phone:</span>{" "}
