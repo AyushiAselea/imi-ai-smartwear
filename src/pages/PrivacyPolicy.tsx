@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">Privacy Policy</h1>
-          <p className="text-sm text-gray-500">Last updated: March 2, 2026</p>
+          <p className="text-sm text-gray-500">Last updated: June 26, 2026</p>
           <p className="mt-4 text-gray-400 leading-relaxed">
             Welcome to <span className="text-white font-medium">IMI Wearables</span> ("we," "our," "us"). Your privacy is important to us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website{" "}
             <a href="https://www.imiglasses.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
@@ -60,7 +60,7 @@ const PrivacyPolicy = () => {
 
             <h3 className="text-base font-semibold text-gray-200 mb-2">c) Sensitive Personal Data</h3>
             <p className="text-gray-400">
-              We do <span className="text-white font-medium">not</span> intentionally collect sensitive personal data unless required for a specific service and with your explicit consent.
+              Where our products or services (including the IMI Glasses mobile application) require sensitive data such as audio, camera, or location, we collect it only with your consent and as described in the <span className="text-white font-medium">"Mobile Application"</span> section below.
             </p>
           </section>
 
@@ -230,9 +230,97 @@ const PrivacyPolicy = () => {
             </p>
           </section>
 
-          {/* Section 14 */}
+          {/* Section 14 — Mobile App */}
           <section className="pt-10">
-            <h2 className="text-xl font-semibold text-white mb-4">14. Contact Us</h2>
+            <h2 className="text-xl font-semibold text-white mb-4">14. Mobile Application — IMI Glasses App</h2>
+            <p className="text-gray-400 mb-4">
+              This section describes how the <span className="text-white font-medium">IMI Glasses mobile application</span> ("the App") collects, uses, and shares data. It applies in addition to the rest of this Privacy Policy. The App connects to IMI smart glasses and provides an AI voice assistant experience.
+            </p>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">1. Microphone and Voice / Audio Data</h3>
+                <p className="text-gray-400">
+                  The App records audio through your device microphone (and the connected glasses) when you activate the voice assistant. This audio may be processed while the App runs in the background as a foreground service so the assistant can keep listening for your commands. Audio is used solely to understand your voice requests and generate AI responses. We do not record audio without your activation.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">2. Camera and Images</h3>
+                <p className="text-gray-400">
+                  With your permission, the App can access your device camera and photos/videos to enable visual features (for example, capturing or analyzing images through the glasses or the App). Images are used only to provide the feature you requested.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">3. Bluetooth</h3>
+                <p className="text-gray-400">
+                  The App uses Bluetooth and Bluetooth Low Energy (BLE) to scan for, pair with, connect to, and communicate with IMI smart glasses hardware. Bluetooth is required for the core functionality of the product.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">4. Location</h3>
+                <p className="text-gray-400">
+                  The App requests location permission (approximate and precise) because Android requires location access for Bluetooth scanning of nearby devices, and to provide location-based assistant features where applicable. We do not sell your location data.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">5. Contacts and Phone</h3>
+                <p className="text-gray-400">
+                  With your permission, the App may access your contacts and make phone calls so the voice assistant can perform requested actions such as calling a contact. This data is used only to carry out the action you request and is not uploaded for any other purpose.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">6. Media and Storage</h3>
+                <p className="text-gray-400">
+                  The App may access photos, videos, and audio files on your device to enable features you choose to use (such as sharing or playing media through the glasses).
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">7. Sharing with Third-Party AI Services (Google)</h3>
+                <p className="text-gray-400">
+                  To provide AI-powered voice and visual assistant features, the App transmits your voice/audio (and, where you use visual features, images) to <span className="text-white font-medium">Google's Gemini AI service</span> for processing. This data is handled in accordance with{" "}
+                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Google's Privacy Policy</a>. We share only the data necessary to generate a response to your request.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">8. Internet and Network</h3>
+                <p className="text-gray-400">
+                  The App requires internet access to communicate with our servers and with the AI service, and to check network/Wi-Fi state to maintain a connection to the glasses.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">9. Notifications</h3>
+                <p className="text-gray-400">
+                  With your permission, the App sends notifications related to the assistant, connection status, and app activity.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">10. Data Retention and Your Choices</h3>
+                <p className="text-gray-400">
+                  You can revoke microphone, camera, location, contacts, and Bluetooth permissions at any time in your device settings; some features will stop working if you do. Audio and images are processed to fulfill your request and are not retained longer than necessary to provide the service. You may contact us (details below) to ask about access or deletion of your data.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-gray-200 mb-2">11. Children</h3>
+                <p className="text-gray-400">
+                  The App is not intended for users under 18, consistent with the rest of this Privacy Policy.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* Section 15 */}
+          <section className="pt-10">
+            <h2 className="text-xl font-semibold text-white mb-4">15. Contact Us</h2>
             <p className="text-gray-400 mb-4">
               If you have any questions about this Privacy Policy or our data practices, you may contact us at:
             </p>
