@@ -2,26 +2,33 @@ import { initiatePayment, type PaymentData, type ShippingAddress } from "@/lib/a
 import { recoverCart } from "@/lib/api";
 
 /**
- * Submits the PayU payment form.
- * Creates a hidden form and auto-submits to redirect to PayU hosted checkout.
+ * Submits the Zaakpay payment form.
+ * Creates a hidden form and auto-submits to redirect to Zaakpay hosted checkout.
  */
-function submitPayUForm(paymentData: PaymentData) {
+function submitZaakpayForm(paymentData: PaymentData) {
   const form = document.createElement("form");
   form.method = "POST";
   form.action = paymentData.action;
   form.style.display = "none";
 
   const fields: Record<string, string> = {
-    key: paymentData.key,
-    txnid: paymentData.txnid,
-    amount: paymentData.amount,
-    productinfo: paymentData.productinfo,
-    firstname: paymentData.firstname,
+    merchantIdentifier: paymentData.merchantIdentifier,
+    orderId: paymentData.orderId,
+    amount: String(paymentData.amount),
+    currency: paymentData.currency,
     email: paymentData.email,
-    phone: paymentData.phone || "",
-    surl: paymentData.surl,
-    furl: paymentData.furl,
-    hash: paymentData.hash,
+    mode: paymentData.mode,
+    returnUrl: paymentData.returnUrl,
+    buyerFirstName: paymentData.buyerFirstName,
+    buyerEmail: paymentData.buyerEmail,
+    buyerPhoneNumber: paymentData.buyerPhoneNumber || "",
+    buyerAddress: paymentData.buyerAddress,
+    buyerCity: paymentData.buyerCity,
+    buyerState: paymentData.buyerState,
+    buyerCountry: paymentData.buyerCountry,
+    buyerPincode: paymentData.buyerPincode,
+    purpose: paymentData.purpose,
+    checksum: paymentData.checksum,
   };
 
   for (const [name, value] of Object.entries(fields)) {
@@ -69,15 +76,15 @@ export async function startPayment(
     recoverCart(sessionId);
   }
 
-  // COD — order created immediately, no PayU redirect
+  // COD — order created immediately, no Zaakpay redirect
   if (response.paymentMethod === "COD") {
     return { type: "cod", order: response.order };
   }
 
-  // ONLINE or PARTIAL — redirect to PayU
+  // ONLINE or PARTIAL — redirect to Zaakpay
   if (!response.paymentData) {
     throw new Error("Missing payment data from server");
   }
-  submitPayUForm(response.paymentData);
+  submitZaakpayForm(response.paymentData);
   return { type: "redirect" };
 }

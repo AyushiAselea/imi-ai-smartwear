@@ -33,7 +33,7 @@ const PaymentSuccess = () => {
     if (txnid) {
       verifyPayment(txnid, token)
         .then(() => setVerified(true))
-        .catch(() => setVerified(true)); // Show success regardless — PayU already confirmed
+        .catch(() => setVerified(true)); // Show success regardless — Zaakpay already confirmed
     } else if (isCOD) {
       setVerified(true);
     }

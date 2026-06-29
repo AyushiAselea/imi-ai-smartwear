@@ -117,18 +117,25 @@ export const syncSocialUser = (
 // ─── Payment APIs ────────────────────────────────────────────
 
 export interface PaymentData {
-  key: string;
-  txnid: string;
-  amount: string;
-  productinfo: string;
-  firstname: string;
-  email: string;
-  phone: string;
-  surl: string;
-  furl: string;
-  hash: string;
-  action: string;
+  merchantIdentifier: string;
   orderId: string;
+  amount: number;
+  currency: string;
+  email: string;
+  mode: string;
+  returnUrl: string;
+  buyerFirstName: string;
+  buyerEmail: string;
+  buyerPhoneNumber: string;
+  buyerAddress: string;
+  buyerCity: string;
+  buyerState: string;
+  buyerCountry: string;
+  buyerPincode: string;
+  purpose: string;
+  checksum: string;
+  action: string;
+  orderDbId: string;
 }
 
 export interface PaymentResponse {

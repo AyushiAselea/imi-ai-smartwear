@@ -37,7 +37,7 @@ interface Props {
   items: CheckoutItem[];
   totalAmount: number;
   onClose: () => void;
-  /** Called after cart items should be cleared (e.g. after PayU redirect) */
+  /** Called after cart items should be cleared (e.g. after Zaakpay redirect) */
   onClearCart?: () => void;
   /** Pre-filled from logged-in user — if present we skip guest signup nudge */
   loggedInEmail?: string;
@@ -215,7 +215,7 @@ export default function CheckoutModal({
             navigate("/payment/success?method=cod");
           }
         } else {
-          // PayU redirect — clear cart then let page redirect
+          // Zaakpay redirect — clear cart then let page redirect
           onClearCart?.();
         }
       } else {
