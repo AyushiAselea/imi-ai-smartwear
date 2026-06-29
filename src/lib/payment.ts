@@ -2,8 +2,9 @@ import { initiatePayment, type PaymentData, type ShippingAddress } from "@/lib/a
 import { recoverCart } from "@/lib/api";
 
 /**
- * Submits the Zaakpay payment form.
+ * Submits the Zaakpay V13 payment form.
  * Creates a hidden form and auto-submits to redirect to Zaakpay hosted checkout.
+ * Field names must exactly match the Zaakpay V13 API spec.
  */
 function submitZaakpayForm(paymentData: PaymentData) {
   const form = document.createElement("form");
@@ -12,23 +13,23 @@ function submitZaakpayForm(paymentData: PaymentData) {
   form.style.display = "none";
 
   const fields: Record<string, string> = {
-    merchantIdentifier: paymentData.merchantIdentifier,
-    orderId: paymentData.orderId,
-    amount: String(paymentData.amount),
-    currency: paymentData.currency,
-    email: paymentData.email,
-    mode: paymentData.mode,
-    returnUrl: paymentData.returnUrl,
-    buyerFirstName: paymentData.buyerFirstName,
-    buyerEmail: paymentData.buyerEmail,
-    buyerPhoneNumber: paymentData.buyerPhoneNumber || "",
-    buyerAddress: paymentData.buyerAddress,
-    buyerCity: paymentData.buyerCity,
-    buyerState: paymentData.buyerState,
-    buyerCountry: paymentData.buyerCountry,
-    buyerPincode: paymentData.buyerPincode,
-    purpose: paymentData.purpose,
-    checksum: paymentData.checksum,
+    merchantIdentifier:  paymentData.merchantIdentifier,
+    orderId:             paymentData.orderId,
+    amount:              paymentData.amount,
+    currency:            paymentData.currency,
+    buyerEmailAddress:   paymentData.buyerEmailAddress,
+    buyerFirstName:      paymentData.buyerFirstName,
+    buyerLastName:       paymentData.buyerLastName,
+    buyerAddress:        paymentData.buyerAddress,
+    buyerCity:           paymentData.buyerCity,
+    buyerState:          paymentData.buyerState,
+    buyerCountry:        paymentData.buyerCountry,
+    buyerPincode:        paymentData.buyerPincode,
+    buyerPhoneNumber:    paymentData.buyerPhoneNumber || "",
+    productDescription:  paymentData.productDescription,
+    returnUrl:           paymentData.returnUrl,
+    mode:                paymentData.mode,
+    checksum:            paymentData.checksum,
   };
 
   for (const [name, value] of Object.entries(fields)) {

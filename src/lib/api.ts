@@ -119,22 +119,22 @@ export const syncSocialUser = (
 export interface PaymentData {
   merchantIdentifier: string;
   orderId: string;
-  amount: number;
+  amount: string;            // paise as a string, e.g. "1139905"
   currency: string;
-  email: string;
-  mode: string;
-  returnUrl: string;
+  buyerEmailAddress: string;
   buyerFirstName: string;
-  buyerEmail: string;
-  buyerPhoneNumber: string;
+  buyerLastName: string;
   buyerAddress: string;
   buyerCity: string;
   buyerState: string;
   buyerCountry: string;
   buyerPincode: string;
-  purpose: string;
+  buyerPhoneNumber: string;
+  productDescription: string;
+  returnUrl: string;
+  mode: string;
   checksum: string;
-  action: string;
+  action: string;            // https://zaakstaging.zaakpay.com/api/paymentTransact/V13
   orderDbId: string;
 }
 
