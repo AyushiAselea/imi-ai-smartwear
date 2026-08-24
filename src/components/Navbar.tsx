@@ -15,19 +15,19 @@ const PromoBanner = () => (
   <div className={`fixed top-0 left-0 right-0 z-[60] ${BANNER_HEIGHT} bg-gradient-to-r from-primary via-teal-600 to-primary text-white flex items-center overflow-hidden`}>
     <div className="animate-marquee whitespace-nowrap flex items-center gap-12 text-sm font-medium">
       <span className="flex items-center gap-2">
-        🔥 Buy IMI Mark 1 at <strong>₹2,999</strong> — Limited offer for first 100 users!
+        🔥 Buy IMI Mark 1 at <strong>₹3,499</strong> — Limited offer for first 100 users!
       </span>
       <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
       <span className="flex items-center gap-2">
-        🔥 Buy IMI Mark 1 at <strong>₹2,999</strong> — Limited offer for first 100 users!
+        🔥 Buy IMI Mark 1 at <strong>₹3,499</strong> — Limited offer for first 100 users!
       </span>
       <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
       <span className="flex items-center gap-2">
-        🔥 Buy IMI Mark 1 at <strong>₹2,999</strong> — Limited offer for first 100 users!
+        🔥 Buy IMI Mark 1 at <strong>₹3,499</strong> — Limited offer for first 100 users!
       </span>
       <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
       <span className="flex items-center gap-2">
-        🔥 Buy IMI Mark 1 at <strong>₹2,999</strong> — Limited offer for first 100 users!
+        🔥 Buy IMI Mark 1 at <strong>₹3,499</strong> — Limited offer for first 100 users!
       </span>
       <img src={logoSmallWhite} alt="IMI" className="h-4 w-auto opacity-70" />
     </div>

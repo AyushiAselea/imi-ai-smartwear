@@ -137,7 +137,7 @@ const productData: Record<string, ProductInfo> = {
     tagline: "Smart Everyday AI Glasses",
     description:
       "Affordable AI glasses built for everyday smart lifestyle. Voice-activated, AI-powered, and designed for the modern Indian user. Say \"Hey IMI\" and get answers quickly. The game will never be the same with IMI Mark 1.",
-    price: "₹2,999",
+    price: "₹3,499",
     originalPrice: "₹5,999",
     video: mark1Video,
     glassOptions: [
@@ -523,6 +523,23 @@ const ProductPage = () => {
   const effectiveFrameVariants = dynamicVariants?.frameVariants ?? product?.frameVariants ?? [];
   const effectiveGlassOptions  = dynamicVariants?.glassOptions  ?? product?.glassOptions  ?? [];
 
+  // ── Live price from the admin panel ──
+  // Prefer the price on the selected backend variant, then the product-level
+  // price, and only fall back to the static string when the API is unreachable.
+  const backendPrice = (() => {
+    if (!backendProduct) return null;
+    // selectedFrame is a colour id ("black" / "white" / "blue"); backend
+    // variants carry that colour in frameType (or color) — match on it.
+    const match = (backendProduct.variants ?? []).find(
+      (v) => (v.frameType || v.color || "").toLowerCase() === selectedFrame.toLowerCase()
+    );
+    return match?.price ?? backendProduct.price ?? null;
+  })();
+
+  const effectivePrice = backendPrice != null
+    ? `₹${backendPrice.toLocaleString("en-IN")}`
+    : product?.price ?? "";
+
   // Scroll to top + reset on route change
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -586,7 +603,7 @@ const ProductPage = () => {
         sessionStorage.getItem("imi_session_id") ||
         `s_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
       if (!sessionStorage.getItem("imi_session_id")) sessionStorage.setItem("imi_session_id", sessionId);
-      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
+      const priceNum = parseInt(effectivePrice.replace(/[₹,]/g, ""));
       updateCart({
         sessionId,
         userId: user?.id,
@@ -614,7 +631,7 @@ const ProductPage = () => {
     setShowCheckout(true);
   };
 
-  const priceNum = product ? parseInt(product.price.replace(/[₹,]/g, "")) : 0;
+  const priceNum = product ? parseInt(effectivePrice.replace(/[₹,]/g, "")) : 0;
 
   /* ── 404 ── */
   if (!product) {
@@ -778,10 +795,10 @@ const ProductPage = () => {
 
               {/* Price */}
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-bold text-foreground">{product.price}</span>
+                <span className="text-4xl font-bold text-foreground">{effectivePrice}</span>
                 <span className="text-lg text-muted-foreground line-through">{product.originalPrice}</span>
                 <span className="text-sm font-semibold text-primary">
-                  Save {Math.round((1 - parseInt(product.price.replace(/[₹,]/g, "")) / parseInt(product.originalPrice.replace(/[₹,]/g, ""))) * 100)}%
+                  Save {Math.round((1 - parseInt(effectivePrice.replace(/[₹,]/g, "")) / parseInt(product.originalPrice.replace(/[₹,]/g, ""))) * 100)}%
                 </span>
               </div>
 
@@ -791,14 +808,14 @@ const ProductPage = () => {
                   onClick={handleBuyNow}
                   className="flex-1 py-4 rounded-full bg-primary text-primary-foreground font-semibold text-lg hover:opacity-90 transition-opacity"
                 >
-                  {`Buy Now   ${product.price}`}
+                  {`Buy Now   ${effectivePrice}`}
                 </button>
                 <button
                   onClick={async () => {
                     if (!user) { toast.error("Please sign in to add items to cart"); navigate("/auth"); return; }
                     setAddingToCart(true);
                     try {
-                      const priceNum = parseInt(product.price.replace(/[₹,]/g, ""));
+                      const priceNum = parseInt(effectivePrice.replace(/[₹,]/g, ""));
                       await addToCart({ productId: slug || "", name: product.name, price: priceNum, image: currentImage, variant: `${selectedFrame} / ${selectedGlass}` });
                       toast.success("Added to cart!");
                     } catch (err: any) { toast.error(err.message || "Failed to add to cart"); } finally { setAddingToCart(false); }

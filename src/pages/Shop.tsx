@@ -36,7 +36,7 @@ const allProducts: ProductCard[] = [
     variant: "Glossy Black",
     variantColor: "bg-gray-900",
     tagline: "Smart Everyday AI Glasses",
-    price: "₹2,999",
+    price: "₹3,499",
     originalPrice: "₹5,999",
     image: mark1Img,
     features: [
@@ -53,7 +53,7 @@ const allProducts: ProductCard[] = [
     variant: "Pearl White",
     variantColor: "bg-white border border-gray-300",
     tagline: "Smart Everyday AI Glasses",
-    price: "₹2,999",
+    price: "₹3,499",
     originalPrice: "₹5,999",
     image: mark1WhiteImg,
     features: [

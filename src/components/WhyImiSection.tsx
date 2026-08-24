@@ -6,7 +6,7 @@ import {
 
 const points = [
   { icon: Cpu, title: "AI-Powered Wearable Technology", desc: "Cutting-edge AI built into sleek eyewear — ask questions, get translations, and navigate hands-free." },
-  { icon: IndianRupee, title: "Affordable for India", desc: "Premium smart glasses starting at ₹2,999 — a fraction of the global price without compromising quality." },
+  { icon: IndianRupee, title: "Affordable for India", desc: "Premium smart glasses starting at ₹3,499 — a fraction of the global price without compromising quality." },
   { icon: Users, title: "Designed for Indian Users", desc: "Hindi, Tamil, Telugu & 25+ language support with voice AI tailored for Indian accents and context." },
   { icon: Sparkles, title: "Stylish & Lightweight", desc: "Weighing just 42.5g, designed to look like regular glasses — wear all day without compromise." },
   { icon: Rocket, title: "Future-Ready Innovation", desc: "Regular OTA updates add new AI features over time — your glasses keep getting smarter." },
