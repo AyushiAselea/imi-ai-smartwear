@@ -1,20 +1,15 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Volume2, VolumeX, Play, Pause } from "lucide-react";
-import imiVed1 from "@/assets/imi ved3.mp4";
-import imiVed2 from "@/assets/imi_ved2.mp4";
-import imiVed3 from "@/assets/imi_ved3.mp4";
-import imiVed4 from "@/assets/imi_ved4.mp4";
 
 const videos = [
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789023227/Your_AI_now_on_your_eyes_Capture_moments_talk_smarter_and_stay_connected_all_hands-free.IM_vasxce.mp4", title: "Voice Control" },
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789023227/Control_your_world_without_lifting_a_finger_Just_say_Hey_IMI_and_let_your_glasses_do_the_r_nrwjh7.mp4", title: "AI on Your Eyes" },
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789023766/13_nov_imi_reel_2_l5ucsm.mp4", title: "IMI Smart Glasses" },
   { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789023754/new_reel_12_nov_2_zvltec.mp4", title: "See Smarter" },
-  { src: imiVed1, title: "IMI in Action" },
-  { src: imiVed2, title: "Capture Moments" },
-  { src: imiVed3, title: "Stay Connected" },
-  { src: imiVed4, title: "Hands-Free Living" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789026550/imi_ved2_phsqrv.mp4", title: "Capture Moments" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789026557/imi_ved3_uy7e2i.mp4", title: "Stay Connected" },
+  { src: "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789026550/imi_ved4_sluzsq.mp4", title: "Hands-Free Living" },
 ];
 
 const VideoCarousel = () => {
