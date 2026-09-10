@@ -127,9 +127,8 @@ interface ProductInfo {
 /*  PRODUCT DATA                                                       */
 /* ================================================================== */
 
-const CLD = "https://res.cloudinary.com/dvvifezwm/video/upload/f_auto,q_auto";
-const mark1Video = `${CLD}/13_nov_imi_reel_2_vacfxr.mp4`;
-const mark2Video = `https://res.cloudinary.com/dvvifezwm/video/upload/v1772089510/30_oct_reel_2_h4vt3k.mp4`;
+const mark1Video = `https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789023766/13_nov_imi_reel_2_l5ucsm.mp4`;
+const mark2Video = `https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789022271/WhatsApp_Video_2026-02-27_at_4.51.19_PM_1_czn0f3.mp4`;
 
 const productData: Record<string, ProductInfo> = {
   "mark-1": {

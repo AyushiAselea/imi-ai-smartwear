@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 const HERO_VIDEO_URL =
-  "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1778227127/WhatsApp_Video_2026-02-27_at_4.51.19_PM_1_oaxac8.mp4";
+  "https://res.cloudinary.com/dtf4xtq7x/video/upload/v1789022271/WhatsApp_Video_2026-02-27_at_4.51.19_PM_1_czn0f3.mp4";
 
 const HeroSection = () => {
   return (
